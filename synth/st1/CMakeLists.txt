@@ -20,7 +20,9 @@ juce_add_plugin(st1
 target_sources(st1
     PRIVATE
         PluginEditor.cpp
+        PluginEditor.hpp
         PluginProcessor.cpp
+        PluginProcessor.hpp
 )
 
 target_compile_definitions(st1
