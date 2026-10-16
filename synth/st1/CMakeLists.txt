@@ -19,6 +19,8 @@ juce_add_plugin(st1
 
 target_sources(st1
     PRIVATE
+        components/EnvelopeVisualizer.cpp
+        components/EnvelopeVisualizer.hpp
         PluginEditor.cpp
         PluginEditor.hpp
         PluginProcessor.cpp

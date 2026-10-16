@@ -6,7 +6,8 @@
 
 namespace st1
 {
-    class PluginProcessor  : public juce::AudioProcessor
+    class PluginProcessor  :
+        public juce::AudioProcessor
     {
     public:
         enum
@@ -22,30 +23,29 @@ namespace st1
 
         void prepareToPlay(double newSampleRate, int samplesPerBlock) override;
         void releaseResources() override;
-        void processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiBuffer) override;
+        void processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &midiBuffer) override;
 
-        juce::AudioProcessorEditor* createEditor() override          { return new juce::GenericAudioProcessorEditor (*this); }
-        bool hasEditor() const override                              { return true; }
+        juce::AudioProcessorEditor* createEditor() override;
+        bool hasEditor() const override;
+        const juce::String getName() const override;
+        bool acceptsMidi() const override;
+        bool producesMidi() const override;
+        double getTailLengthSeconds() const override;
+        int getNumPrograms() override;
+        int getCurrentProgram() override;
+        void setCurrentProgram(int) override;
+        const juce::String getProgramName(int) override;
+        void changeProgramName(int, const juce::String&) override;
+        void getStateInformation (juce::MemoryBlock&) override;
+        void setStateInformation (const void*, int) override;
 
-        const juce::String getName() const override                  { return "Multi Out Synth"; }
-        bool acceptsMidi() const override                            { return false; }
-        bool producesMidi() const override                           { return false; }
-        double getTailLengthSeconds() const override                 { return 0; }
-        int getNumPrograms() override                                { return 1; }
-        int getCurrentProgram() override                             { return 0; }
-        void setCurrentProgram (int) override                        {}
-        const juce::String getProgramName (int) override             { return {}; }
-        void changeProgramName (int, const juce::String&) override   {}
-
-        void getStateInformation (juce::MemoryBlock&) override {}
-        void setStateInformation (const void*, int) override {}
     private:
-        static juce::MidiBuffer filterMidiMessagesForChannel (const juce::MidiBuffer& input, int channel);
+        static juce::MidiBuffer filterMidiMessagesForChannel(const juce::MidiBuffer &input, int channel);
 
         juce::OwnedArray<juce::Synthesiser> synth_;
         juce::SynthesiserSound::Ptr sound;
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginProcessor)
     };
 }
 

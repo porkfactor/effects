@@ -1,4 +1,5 @@
 #include "PluginProcessor.hpp"
+#include "PluginEditor.hpp"
 
 namespace st1
 {
@@ -145,6 +146,63 @@ namespace st1
             }
         }
     }
+
+    juce::AudioProcessorEditor *PluginProcessor::createEditor()
+    {
+        return new PluginEditor(*this);
+    }
+
+    bool PluginProcessor::hasEditor() const
+    {
+        return true;
+    }
+
+    juce::String const PluginProcessor::getName() const
+    {
+        return "Multi Out Synth";
+    }
+
+    bool PluginProcessor::acceptsMidi() const
+    {
+        return false;
+    }
+
+    bool PluginProcessor::producesMidi() const
+    {
+        return false;
+    }
+
+    double PluginProcessor::getTailLengthSeconds() const
+    {
+        return 0;
+    }
+
+    int PluginProcessor::getNumPrograms()
+    {
+        return 1; 
+    }
+
+    int PluginProcessor::getCurrentProgram()
+    {
+        return 0;
+    }
+
+    void PluginProcessor::setCurrentProgram(int)
+    {}
+
+    juce::String const PluginProcessor::getProgramName(int)
+    {
+        return {};
+    }
+
+    void PluginProcessor::changeProgramName(int, const juce::String &)
+    {}
+
+    void PluginProcessor::getStateInformation(juce::MemoryBlock &)
+    {}
+
+    void PluginProcessor::setStateInformation(const void*, int)
+    {}
 
     bool PluginProcessor::canAddBus(bool isInput) const
     {
