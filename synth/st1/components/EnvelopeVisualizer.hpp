@@ -20,8 +20,15 @@ namespace st1
                 quadratic,
             };
 
-            EnvelopeSegment(value_type, value_type);
-            EnvelopeSegment(value_type, value_type, value_type, value_type);
+            EnvelopeSegment(value_type, value_type)
+            {
+
+            }
+
+            EnvelopeSegment(value_type, value_type, value_type, value_type)
+            {
+                
+            }
 
             inline juce::Point<value_type> const &start() const noexcept
             {
@@ -33,7 +40,7 @@ namespace st1
                 return end_;
             }
 
-            inline juce::Point<value_type> const &start() const noexcept
+            inline juce::Point<value_type> const &intercept() const noexcept
             {
                 return intercept_;
             }

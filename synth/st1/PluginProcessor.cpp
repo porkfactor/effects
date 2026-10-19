@@ -1,8 +1,32 @@
 #include "PluginProcessor.hpp"
 #include "PluginEditor.hpp"
 
+// #include <dsp/oscillator/naive_sawtooth.hpp>
+
 namespace st1
 {
+    /**
+     * Use `SynthesiserSound to store sound data associated with
+     * a voice type (e.g. wavetable data that is shared across voices)
+     * 
+     * Calling it 'SoundData' would make more sense to me.
+     * 
+     * Use `SynthesiserVoice to render a sound. Seems that the voice is
+     * re-used on a whim so it's critical that SynthesiserVoice::clearCurrentNote()
+     * is invoked to mark the voice as unused.
+     * 
+     * Calling it 'SoundGenerator' would make more sense to me.
+     * 
+     * Anyway. Squishing these down so that we have a small number of fundamental
+     * voice types seems like a good idea. 
+     * 
+     * - Wavetable
+     * - FM
+     * - Subtractive
+     * - etc.
+     * 
+     * 
+     */
     struct SinWaveSound   : public juce::SynthesiserSound
     {
         SinWaveSound() {}
@@ -18,10 +42,10 @@ namespace st1
         }
     };
 
-    class SinWaveVoice : public juce::SynthesiserVoice
+    class SinusoidalVoice : public juce::SynthesiserVoice
     {
     public:
-        SinWaveVoice()
+        SinusoidalVoice()
         {}
 
         bool canPlaySound(juce::SynthesiserSound *) override
@@ -31,28 +55,14 @@ namespace st1
 
         void startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition) override
         {
-            currentAngle = 0.0;
-            level = velocity * 0.15;
-            tailOff = 0.0;
-
-            auto cyclesPerSecond = juce::MidiMessage::getMidiNoteInHertz (midiNoteNumber);
-            auto cyclesPerSample = cyclesPerSecond / getSampleRate();
-
-            angleDelta = cyclesPerSample * 2.0 * juce::MathConstants<double>::pi;
+            velocity_ = static_cast<double>(velocity);
+            delta_ = juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber) / SynthesiserVoice::getSampleRate();
         }
 
         void stopNote(float velocity, bool allowTailOff) override
         {
-            if (allowTailOff)
-            {
-                if (tailOff == 0.0)
-                    tailOff = 1.0;
-            }
-            else
-            {
-                clearCurrentNote();
-                angleDelta = 0.0;
-            }
+            SynthesiserVoice::clearCurrentNote();
+            delta_ = 0.0;
         }
 
         void pitchWheelMoved(int newPitchWheelValue) override
@@ -67,52 +77,247 @@ namespace st1
 
         void renderNextBlock(juce::AudioBuffer<float> &outputBuffer, int startSample, int numSamples) override
         {
-            if (angleDelta != 0.0)
+            if (delta_ != 0.0)
             {
-                if (tailOff > 0.0) // [7]
+                int const numChannels = outputBuffer.getNumChannels();
+                int sampleIdx{};
+                float currentSample = .0f;
+    
+                do
                 {
-                    while (--numSamples >= 0)
+                    int channelIdx{};
+
+                    currentSample = static_cast<float>(velocity_ * ((2.0 * std::sin(modulo_ * 2.0 * M_PI)) - 1.0));
+
+                    modulo_ += delta_;
+
+                    if (modulo_ > 1.0)
+                        modulo_ -= 1.0;
+
+                    do
                     {
-                        auto currentSample = (float) (std::sin (currentAngle) * level * tailOff);
-
-                        for (auto i = outputBuffer.getNumChannels(); --i >= 0;)
-                            outputBuffer.addSample (i, startSample, currentSample);
-
-                        currentAngle += angleDelta;
-                        ++startSample;
-
-                        tailOff *= 0.99; // [8]
-
-                        if (tailOff <= 0.005)
-                        {
-                            clearCurrentNote(); // [9]
-
-                            angleDelta = 0.0;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    while (--numSamples >= 0) // [6]
-                    {
-                        auto currentSample = (float) (std::sin (currentAngle) * level);
-
-                        for (auto i = outputBuffer.getNumChannels(); --i >= 0;)
-                            outputBuffer.addSample (i, startSample, currentSample);
-
-                        currentAngle += angleDelta;
-                        ++startSample;
-                    }
-                }
+                        outputBuffer.addSample(channelIdx, startSample + sampleIdx, currentSample);
+                        ++channelIdx;
+                    } while(channelIdx < numChannels);
+    
+                    ++sampleIdx;
+                } while (sampleIdx < numSamples);
             }
         }
 
     private:
-        double currentAngle = 0.0;
-        double angleDelta = 0.0;
-        double level = 0.0;
-        double tailOff = 0.0;
+        double velocity_{};
+        double delta_{};
+        double modulo_{};
+    };
+
+    class SquareVoice : public juce::SynthesiserVoice
+    {
+    public:
+        SquareVoice() :
+            pulse_width_(20.0 / 100.0)
+        {}
+
+        bool canPlaySound(juce::SynthesiserSound *) override
+        {
+            return true;
+        }
+
+        void startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition) override
+        {
+            velocity_ = static_cast<double>(velocity);
+            delta_ = juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber) / SynthesiserVoice::getSampleRate();
+        }
+
+        void stopNote(float velocity, bool allowTailOff) override
+        {
+            SynthesiserVoice::clearCurrentNote();
+            delta_ = 0.0;
+        }
+
+        void pitchWheelMoved(int newPitchWheelValue) override
+        {
+
+        }
+
+        void controllerMoved(int controllerNumber, int newControllerValue) override
+        {
+
+        }
+
+        void renderNextBlock(juce::AudioBuffer<float> &outputBuffer, int startSample, int numSamples) override
+        {
+            if (delta_ != 0.0)
+            {
+                int const numChannels = outputBuffer.getNumChannels();
+                int sampleIdx{};
+                float currentSample = .0f;
+    
+                do
+                {
+                    int channelIdx{};
+
+                    currentSample = static_cast<float>(velocity_ * ((modulo_ > pulse_width_) ? 1.0 : -1.0));
+
+                    modulo_ += delta_;
+
+                    if (modulo_ > 1.0)
+                        modulo_ -= 1.0;
+
+                    do
+                    {
+                        outputBuffer.addSample(channelIdx, startSample + sampleIdx, currentSample);
+                        ++channelIdx;
+                    } while(channelIdx < numChannels);
+    
+                    ++sampleIdx;
+                } while (sampleIdx < numSamples);
+            }
+        }
+
+    private:
+        double velocity_{};
+        double delta_{};
+        double modulo_{};
+        double pulse_width_{};
+    };
+
+    class TriangleVoice : public juce::SynthesiserVoice
+    {
+    public:
+        TriangleVoice()
+        {}
+
+        bool canPlaySound(juce::SynthesiserSound *) override
+        {
+            return true;
+        }
+
+        void startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition) override
+        {
+            velocity_ = static_cast<double>(velocity);
+            delta_ = juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber) / SynthesiserVoice::getSampleRate();
+        }
+
+        void stopNote(float velocity, bool allowTailOff) override
+        {
+            SynthesiserVoice::clearCurrentNote();
+            delta_ = 0.0;
+        }
+
+        void pitchWheelMoved(int newPitchWheelValue) override
+        {
+
+        }
+
+        void controllerMoved(int controllerNumber, int newControllerValue) override
+        {
+
+        }
+
+        void renderNextBlock(juce::AudioBuffer<float> &outputBuffer, int startSample, int numSamples) override
+        {
+            if (delta_ != 0.0)
+            {
+                int const numChannels = outputBuffer.getNumChannels();
+                int sampleIdx{};
+                float currentSample = .0f;
+    
+                do
+                {
+                    int channelIdx{};
+
+                    currentSample = static_cast<float>(velocity_ * ((2.0 * abs((2.0 * modulo_) - 1.0)) - 1.0));
+
+                    modulo_ += delta_;
+
+                    if (modulo_ > 1.0)
+                        modulo_ -= 1.0;
+
+                    do
+                    {
+                        outputBuffer.addSample(channelIdx, startSample + sampleIdx, currentSample);
+                        ++channelIdx;
+                    } while(channelIdx < numChannels);
+    
+                    ++sampleIdx;
+                } while (sampleIdx < numSamples);
+            }
+        }
+
+    private:
+        double velocity_{};
+        double delta_{};
+        double modulo_{};
+    };
+
+    class SawtoothVoice : public juce::SynthesiserVoice
+    {
+    public:
+        SawtoothVoice()
+        {}
+
+        bool canPlaySound(juce::SynthesiserSound *) override
+        {
+            return true;
+        }
+
+        void startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition) override
+        {
+            velocity_ = static_cast<double>(velocity);
+            delta_ = juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber) / SynthesiserVoice::getSampleRate();
+        }
+
+        void stopNote(float velocity, bool allowTailOff) override
+        {
+            SynthesiserVoice::clearCurrentNote();
+            delta_ = 0.0;
+        }
+
+        void pitchWheelMoved(int newPitchWheelValue) override
+        {
+
+        }
+
+        void controllerMoved(int controllerNumber, int newControllerValue) override
+        {
+
+        }
+
+        void renderNextBlock(juce::AudioBuffer<float> &outputBuffer, int startSample, int numSamples) override
+        {
+            if (delta_ != 0.0)
+            {
+                int const numChannels = outputBuffer.getNumChannels();
+                int sampleIdx{};
+                float currentSample = .0f;
+    
+                do
+                {
+                    int channelIdx{};
+    
+                    currentSample = static_cast<float>(velocity_ * ((modulo_ * 2.0) - 1.0));
+    
+                    modulo_ += delta_;
+    
+                    if (modulo_ > 1.0)
+                        modulo_ -= 1.0;
+    
+                    do
+                    {
+                        outputBuffer.addSample(channelIdx, startSample + sampleIdx, currentSample);
+                        ++channelIdx;
+                    } while(channelIdx < numChannels);
+    
+                    ++sampleIdx;
+                } while (sampleIdx < numSamples);
+            }
+        }
+
+    private:
+        double velocity_{};
+        double delta_{};
+        double modulo_{};
     };
 
     PluginProcessor::PluginProcessor() :
@@ -141,7 +346,7 @@ namespace st1
 
             for (auto i = 0; i < maxNumberOfVoices; ++i)
             {
-                synth_[midiChannel]->addVoice(new SinWaveVoice());
+                synth_[midiChannel]->addVoice(new SinusoidalVoice());
                 synth_[midiChannel]->addSound(new SinWaveSound());
             }
         }
@@ -222,10 +427,10 @@ namespace st1
         juce::ignoreUnused(samplesPerBlock);
 
         for (auto midiChannel = 0; midiChannel < maxMidiChannel; ++midiChannel)
-            synth_[midiChannel]->setCurrentPlaybackSampleRate (newSampleRate);
+            synth_[midiChannel]->setCurrentPlaybackSampleRate(newSampleRate);
     }
 
-    void PluginProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiBuffer)
+    void PluginProcessor::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer& midiBuffer)
     {
         auto busCount = getBusCount(false);
 
@@ -238,7 +443,7 @@ namespace st1
         }
     }
 
-    juce::MidiBuffer PluginProcessor::filterMidiMessagesForChannel (const juce::MidiBuffer& input, int channel)
+    juce::MidiBuffer PluginProcessor::filterMidiMessagesForChannel(const juce::MidiBuffer& input, int channel)
     {
         juce::MidiBuffer output;
 
