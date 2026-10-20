@@ -17,14 +17,18 @@ juce_add_plugin(st1
     PRODUCT_NAME "ST1"
 )
 
+set(SOURCES
+    ${CMAKE_CURRENT_LIST_DIR}/PluginEditor.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/PluginEditor.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/PluginProcessor.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/PluginProcessor.hpp
+)
+
+add_subdirectory(voices)
+add_subdirectory(components)
+
 target_sources(st1
-    PRIVATE
-        components/EnvelopeVisualizer.cpp
-        components/EnvelopeVisualizer.hpp
-        PluginEditor.cpp
-        PluginEditor.hpp
-        PluginProcessor.cpp
-        PluginProcessor.hpp
+    PRIVATE ${SOURCES}
 )
 
 target_compile_definitions(st1

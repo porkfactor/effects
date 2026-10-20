@@ -1,7 +1,7 @@
 #include "PluginProcessor.hpp"
 #include "PluginEditor.hpp"
 
-// #include <dsp/oscillator/naive_sawtooth.hpp>
+#include "voices/SinusoidalVoice.hpp"
 
 namespace st1
 {
@@ -27,7 +27,8 @@ namespace st1
      * 
      * 
      */
-    struct SinWaveSound   : public juce::SynthesiserSound
+    struct SinWaveSound :
+        public juce::SynthesiserSound
     {
         SinWaveSound() {}
 
@@ -40,297 +41,24 @@ namespace st1
         {
             return true;
         }
-    };
 
-    class SinusoidalVoice : public juce::SynthesiserVoice
-    {
-    public:
-        SinusoidalVoice()
-        {}
-
-        bool canPlaySound(juce::SynthesiserSound *) override
+        static SinWaveSound *upcast(juce::SynthesiserSound *sound)
         {
-            return true;
+            return static_cast<SinWaveSound *>(sound);
         }
-
-        void startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition) override
-        {
-            velocity_ = static_cast<double>(velocity);
-            delta_ = juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber) / SynthesiserVoice::getSampleRate();
-        }
-
-        void stopNote(float velocity, bool allowTailOff) override
-        {
-            SynthesiserVoice::clearCurrentNote();
-            delta_ = 0.0;
-        }
-
-        void pitchWheelMoved(int newPitchWheelValue) override
-        {
-
-        }
-
-        void controllerMoved(int controllerNumber, int newControllerValue) override
-        {
-
-        }
-
-        void renderNextBlock(juce::AudioBuffer<float> &outputBuffer, int startSample, int numSamples) override
-        {
-            if (delta_ != 0.0)
-            {
-                int const numChannels = outputBuffer.getNumChannels();
-                int sampleIdx{};
-                float currentSample = .0f;
-    
-                do
-                {
-                    int channelIdx{};
-
-                    currentSample = static_cast<float>(velocity_ * ((2.0 * std::sin(modulo_ * 2.0 * M_PI)) - 1.0));
-
-                    modulo_ += delta_;
-
-                    if (modulo_ > 1.0)
-                        modulo_ -= 1.0;
-
-                    do
-                    {
-                        outputBuffer.addSample(channelIdx, startSample + sampleIdx, currentSample);
-                        ++channelIdx;
-                    } while(channelIdx < numChannels);
-    
-                    ++sampleIdx;
-                } while (sampleIdx < numSamples);
-            }
-        }
-
-    private:
-        double velocity_{};
-        double delta_{};
-        double modulo_{};
-    };
-
-    class SquareVoice : public juce::SynthesiserVoice
-    {
-    public:
-        SquareVoice() :
-            pulse_width_(20.0 / 100.0)
-        {}
-
-        bool canPlaySound(juce::SynthesiserSound *) override
-        {
-            return true;
-        }
-
-        void startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition) override
-        {
-            velocity_ = static_cast<double>(velocity);
-            delta_ = juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber) / SynthesiserVoice::getSampleRate();
-        }
-
-        void stopNote(float velocity, bool allowTailOff) override
-        {
-            SynthesiserVoice::clearCurrentNote();
-            delta_ = 0.0;
-        }
-
-        void pitchWheelMoved(int newPitchWheelValue) override
-        {
-
-        }
-
-        void controllerMoved(int controllerNumber, int newControllerValue) override
-        {
-
-        }
-
-        void renderNextBlock(juce::AudioBuffer<float> &outputBuffer, int startSample, int numSamples) override
-        {
-            if (delta_ != 0.0)
-            {
-                int const numChannels = outputBuffer.getNumChannels();
-                int sampleIdx{};
-                float currentSample = .0f;
-    
-                do
-                {
-                    int channelIdx{};
-
-                    currentSample = static_cast<float>(velocity_ * ((modulo_ > pulse_width_) ? 1.0 : -1.0));
-
-                    modulo_ += delta_;
-
-                    if (modulo_ > 1.0)
-                        modulo_ -= 1.0;
-
-                    do
-                    {
-                        outputBuffer.addSample(channelIdx, startSample + sampleIdx, currentSample);
-                        ++channelIdx;
-                    } while(channelIdx < numChannels);
-    
-                    ++sampleIdx;
-                } while (sampleIdx < numSamples);
-            }
-        }
-
-    private:
-        double velocity_{};
-        double delta_{};
-        double modulo_{};
-        double pulse_width_{};
-    };
-
-    class TriangleVoice : public juce::SynthesiserVoice
-    {
-    public:
-        TriangleVoice()
-        {}
-
-        bool canPlaySound(juce::SynthesiserSound *) override
-        {
-            return true;
-        }
-
-        void startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition) override
-        {
-            velocity_ = static_cast<double>(velocity);
-            delta_ = juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber) / SynthesiserVoice::getSampleRate();
-        }
-
-        void stopNote(float velocity, bool allowTailOff) override
-        {
-            SynthesiserVoice::clearCurrentNote();
-            delta_ = 0.0;
-        }
-
-        void pitchWheelMoved(int newPitchWheelValue) override
-        {
-
-        }
-
-        void controllerMoved(int controllerNumber, int newControllerValue) override
-        {
-
-        }
-
-        void renderNextBlock(juce::AudioBuffer<float> &outputBuffer, int startSample, int numSamples) override
-        {
-            if (delta_ != 0.0)
-            {
-                int const numChannels = outputBuffer.getNumChannels();
-                int sampleIdx{};
-                float currentSample = .0f;
-    
-                do
-                {
-                    int channelIdx{};
-
-                    currentSample = static_cast<float>(velocity_ * ((2.0 * abs((2.0 * modulo_) - 1.0)) - 1.0));
-
-                    modulo_ += delta_;
-
-                    if (modulo_ > 1.0)
-                        modulo_ -= 1.0;
-
-                    do
-                    {
-                        outputBuffer.addSample(channelIdx, startSample + sampleIdx, currentSample);
-                        ++channelIdx;
-                    } while(channelIdx < numChannels);
-    
-                    ++sampleIdx;
-                } while (sampleIdx < numSamples);
-            }
-        }
-
-    private:
-        double velocity_{};
-        double delta_{};
-        double modulo_{};
-    };
-
-    class SawtoothVoice : public juce::SynthesiserVoice
-    {
-    public:
-        SawtoothVoice()
-        {}
-
-        bool canPlaySound(juce::SynthesiserSound *) override
-        {
-            return true;
-        }
-
-        void startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int currentPitchWheelPosition) override
-        {
-            velocity_ = static_cast<double>(velocity);
-            delta_ = juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber) / SynthesiserVoice::getSampleRate();
-        }
-
-        void stopNote(float velocity, bool allowTailOff) override
-        {
-            SynthesiserVoice::clearCurrentNote();
-            delta_ = 0.0;
-        }
-
-        void pitchWheelMoved(int newPitchWheelValue) override
-        {
-
-        }
-
-        void controllerMoved(int controllerNumber, int newControllerValue) override
-        {
-
-        }
-
-        void renderNextBlock(juce::AudioBuffer<float> &outputBuffer, int startSample, int numSamples) override
-        {
-            if (delta_ != 0.0)
-            {
-                int const numChannels = outputBuffer.getNumChannels();
-                int sampleIdx{};
-                float currentSample = .0f;
-    
-                do
-                {
-                    int channelIdx{};
-    
-                    currentSample = static_cast<float>(velocity_ * ((modulo_ * 2.0) - 1.0));
-    
-                    modulo_ += delta_;
-    
-                    if (modulo_ > 1.0)
-                        modulo_ -= 1.0;
-    
-                    do
-                    {
-                        outputBuffer.addSample(channelIdx, startSample + sampleIdx, currentSample);
-                        ++channelIdx;
-                    } while(channelIdx < numChannels);
-    
-                    ++sampleIdx;
-                } while (sampleIdx < numSamples);
-            }
-        }
-
-    private:
-        double velocity_{};
-        double delta_{};
-        double modulo_{};
     };
 
     PluginProcessor::PluginProcessor() :
         AudioProcessor(BusesProperties()
-                .withOutput ("Output #1",  juce::AudioChannelSet::stereo(), true)
-                .withOutput ("Output #2",  juce::AudioChannelSet::stereo(), false)
-                .withOutput ("Output #3",  juce::AudioChannelSet::stereo(), false)
-                .withOutput ("Output #4",  juce::AudioChannelSet::stereo(), false)
-                .withOutput ("Output #5",  juce::AudioChannelSet::stereo(), false)
-                .withOutput ("Output #6",  juce::AudioChannelSet::stereo(), false)
-                .withOutput ("Output #7",  juce::AudioChannelSet::stereo(), false)
-                .withOutput ("Output #8",  juce::AudioChannelSet::stereo(), false)
-                .withOutput ("Output #9",  juce::AudioChannelSet::stereo(), false)
+                .withOutput ("Output #1", juce::AudioChannelSet::stereo(), true)
+                .withOutput ("Output #2", juce::AudioChannelSet::stereo(), false)
+                .withOutput ("Output #3", juce::AudioChannelSet::stereo(), false)
+                .withOutput ("Output #4", juce::AudioChannelSet::stereo(), false)
+                .withOutput ("Output #5", juce::AudioChannelSet::stereo(), false)
+                .withOutput ("Output #6", juce::AudioChannelSet::stereo(), false)
+                .withOutput ("Output #7", juce::AudioChannelSet::stereo(), false)
+                .withOutput ("Output #8", juce::AudioChannelSet::stereo(), false)
+                .withOutput ("Output #9", juce::AudioChannelSet::stereo(), false)
                 .withOutput ("Output #10", juce::AudioChannelSet::stereo(), false)
                 .withOutput ("Output #11", juce::AudioChannelSet::stereo(), false)
                 .withOutput ("Output #12", juce::AudioChannelSet::stereo(), false)
@@ -346,7 +74,7 @@ namespace st1
 
             for (auto i = 0; i < maxNumberOfVoices; ++i)
             {
-                synth_[midiChannel]->addVoice(new SinusoidalVoice());
+                synth_[midiChannel]->addVoice(new st1::voices::SinusoidalVoice());
                 synth_[midiChannel]->addSound(new SinWaveSound());
             }
         }
@@ -406,17 +134,17 @@ namespace st1
     void PluginProcessor::getStateInformation(juce::MemoryBlock &)
     {}
 
-    void PluginProcessor::setStateInformation(const void*, int)
+    void PluginProcessor::setStateInformation(void const *, int)
     {}
 
     bool PluginProcessor::canAddBus(bool isInput) const
     {
-        return !isInput && (getBusCount (false) < maxMidiChannel);
+        return !isInput && (AudioProcessor::getBusCount(false) < maxMidiChannel);
     } 
 
     bool PluginProcessor::canRemoveBus(bool isInput) const
     {
-        return !isInput && (getBusCount (false) > 1);
+        return !isInput && (AudioProcessor::getBusCount(false) > 1);
     }
 
     void PluginProcessor::releaseResources(void)
