@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.25.0)
 
 list(APPEND SOURCES
+    ${CMAKE_CURRENT_LIST_DIR}/OscillatorVoice.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/OscillatorVoice.cpp
     ${CMAKE_CURRENT_LIST_DIR}/SawtoothVoice.hpp
     ${CMAKE_CURRENT_LIST_DIR}/SawtoothVoice.cpp
     ${CMAKE_CURRENT_LIST_DIR}/SinusoidalVoice.hpp

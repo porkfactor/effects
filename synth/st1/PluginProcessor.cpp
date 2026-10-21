@@ -1,35 +1,12 @@
 #include "PluginProcessor.hpp"
 #include "PluginEditor.hpp"
 
-#include "voices/SinusoidalVoice.hpp"
+#include "voices/OscillatorVoice.hpp"
 #include "voices/WavetableVoice.hpp"
 #include "voices/WavetableSound.hpp"
 
 namespace st1
 {
-    /**
-     * Use `SynthesiserSound to store sound data associated with
-     * a voice type (e.g. wavetable data that is shared across voices)
-     * 
-     * Calling it 'SoundData' would make more sense to me.
-     * 
-     * Use `SynthesiserVoice to render a sound. Seems that the voice is
-     * re-used on a whim so it's critical that SynthesiserVoice::clearCurrentNote()
-     * is invoked to mark the voice as unused.
-     * 
-     * Calling it 'SoundGenerator' would make more sense to me.
-     * 
-     * Anyway. Squishing these down so that we have a small number of fundamental
-     * voice types seems like a good idea. 
-     * 
-     * - Wavetable
-     * - FM
-     * - Subtractive
-     * - etc.
-     * 
-     * 
-     */
-
     PluginProcessor::PluginProcessor() :
         AudioProcessor(BusesProperties()
                 .withOutput ("Output #1", juce::AudioChannelSet::stereo(), true)
@@ -56,7 +33,7 @@ namespace st1
 
             for (auto i = 0; i < maxNumberOfVoices; ++i)
             {
-                synth_[midiChannel]->addVoice(new st1::voices::WavetableVoice());
+                synth_[midiChannel]->addVoice(new st1::voices::OscillatorVoice());
                 synth_[midiChannel]->addSound(new st1::voices::WavetableSound());
             }
         }
