@@ -11,6 +11,14 @@ namespace st1
             public juce::SynthesiserVoice
         {
         public:
+            enum class wave_type
+            {
+                sinusoid,
+                sawtooth,
+                triangle,
+                square,
+            };
+
             OscillatorVoice();
     
             bool canPlaySound(juce::SynthesiserSound *) override;
@@ -21,12 +29,18 @@ namespace st1
             void renderNextBlock(juce::AudioBuffer<float> &, int, int) override;
 
         private:
-            void pitchWheelAdjust(int cents);
+            double nextSample();
+            void pitchWheelAdjust(int);
+
+            void reset();
 
             double velocity_{};
             double delta_{};
             double modulo_{};
-            double currentFrequency_{};
+            double tailOff_{};
+            double pitchFrequency_{};
+            double pulseWidth_{0.5};
+            enum wave_type type_{wave_type::sinusoid};
         };
     }
 }
