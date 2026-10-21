@@ -2,6 +2,8 @@
 #include "PluginEditor.hpp"
 
 #include "voices/SinusoidalVoice.hpp"
+#include "voices/WavetableVoice.hpp"
+#include "voices/WavetableSound.hpp"
 
 namespace st1
 {
@@ -27,26 +29,6 @@ namespace st1
      * 
      * 
      */
-    struct SinWaveSound :
-        public juce::SynthesiserSound
-    {
-        SinWaveSound() {}
-
-        bool appliesToNote(int) override
-        {
-            return true;
-        }
-
-        bool appliesToChannel(int) override
-        {
-            return true;
-        }
-
-        static SinWaveSound *upcast(juce::SynthesiserSound *sound)
-        {
-            return static_cast<SinWaveSound *>(sound);
-        }
-    };
 
     PluginProcessor::PluginProcessor() :
         AudioProcessor(BusesProperties()
@@ -74,8 +56,8 @@ namespace st1
 
             for (auto i = 0; i < maxNumberOfVoices; ++i)
             {
-                synth_[midiChannel]->addVoice(new st1::voices::SinusoidalVoice());
-                synth_[midiChannel]->addSound(new SinWaveSound());
+                synth_[midiChannel]->addVoice(new st1::voices::WavetableVoice());
+                synth_[midiChannel]->addSound(new st1::voices::WavetableSound());
             }
         }
     }

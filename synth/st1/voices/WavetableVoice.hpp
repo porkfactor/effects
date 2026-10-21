@@ -7,13 +7,7 @@ namespace st1
 {
     namespace voices
     {
-        class WavetableSound : public juce::SynthesiserSound
-        {
-        public:
-            WavetableSound();
-
-        private:
-        };
+        class WavetableSound;
 
         class WavetableVoice : public juce::SynthesiserVoice
         {
@@ -28,6 +22,13 @@ namespace st1
             void renderNextBlock(juce::AudioBuffer<float> &, int, int) override;
 
         private:
+            double nextSample(double const *, double);
+
+            WavetableSound *sound_{};
+            double velocity_{0.0};
+            double readIndex_{0.0};
+            double delta_{0.0};
+            double phase_modulation_{0.0};
         };
     }
 }

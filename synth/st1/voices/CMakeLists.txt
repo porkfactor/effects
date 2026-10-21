@@ -9,6 +9,8 @@ list(APPEND SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/SquareVoice.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TriangleVoice.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TriangleVoice.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/WavetableSound.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/WavetableSound.hpp
     ${CMAKE_CURRENT_LIST_DIR}/WavetableVoice.cpp
     ${CMAKE_CURRENT_LIST_DIR}/WavetableVoice.hpp
 )
