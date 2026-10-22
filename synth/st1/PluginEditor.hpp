@@ -5,6 +5,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "components/EnvelopeVisualizer.hpp"
+#include "components/OscillatorEditor.hpp"
 
 namespace st1
 {
@@ -22,7 +23,9 @@ namespace st1
         void resized() override;
 
     private:
-        gui::EnvelopeVisualizer ev_;
+        gui::OscillatorEditor oscillator_;
+
+        // gui::EnvelopeVisualizer ev_;
     };
 }
 

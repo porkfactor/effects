@@ -16,26 +16,22 @@ namespace st1
         {
             g.fillAll(juce::Colours::darkgrey);
 
-            // 1. Construct the Path dynamically from the anchor coordinates
             juce::Path curvePath;
             if (!segments_.empty())
             {
                 curvePath.startNewSubPath(segments_[0].start());
 
-                // Draw a simple multi-segment line or insert bezier logic here
                 for (size_t i = 1; i < segments_.size(); ++i)
                 {
                     curvePath.lineTo(segments_[i].start());
                 }
             }
 
-            // 2. Stroke the path lines
             g.setColour(juce::Colours::cyan);
             g.strokePath(curvePath, juce::PathStrokeType(3.0f));
 
             if (selected_ != npos)
             {
-                // Highlight the anchor if it's currently grabbed
                 g.setColour(grabbed_ ? juce::Colours::yellow : juce::Colours::white);
                 
                 g.fillEllipse(

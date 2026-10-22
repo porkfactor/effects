@@ -146,5 +146,35 @@ namespace st1
                 delta_ = (pitchFrequency_ * frequency_adjust) / SynthesiserVoice::getSampleRate();
             }
         }
+
+        OscillatorVoice::wave_type OscillatorVoice::getOscillatorType() const
+        {
+            return type_;
+        }
+
+        double OscillatorVoice::getPulseWidth() const
+        {
+            return pulseWidth_;
+        }
+
+        double OscillatorVoice::getPitchShift() const
+        {
+            return pitchShift_;
+        }
+
+        void OscillatorVoice::setOscillatorType(OscillatorVoice::wave_type type)
+        {
+
+        }
+
+        void OscillatorVoice::setPitchShift(double v)
+        {
+
+        }
+
+        void OscillatorVoice::setPulseWidth(double v)
+        {
+
+        }
     }
 }

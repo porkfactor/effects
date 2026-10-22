@@ -25,7 +25,8 @@ namespace st1
                 .withOutput ("Output #14", juce::AudioChannelSet::stereo(), false)
                 .withOutput ("Output #15", juce::AudioChannelSet::stereo(), false)
                 .withOutput ("Output #16", juce::AudioChannelSet::stereo(), false)
-            )
+            ),
+        state_(*this, nullptr)
     {
         for (auto midiChannel = 0; midiChannel < maxMidiChannel; ++midiChannel)
         {
@@ -143,6 +144,11 @@ namespace st1
         }
 
         return output;
+    }
+
+    juce::AudioProcessorValueTreeState &PluginProcessor::state()
+    {
+        return state_;
     }
 }
 

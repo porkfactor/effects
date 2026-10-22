@@ -28,6 +28,14 @@ namespace st1
             void controllerMoved(int, int) override;
             void renderNextBlock(juce::AudioBuffer<float> &, int, int) override;
 
+            void setPitchShift(double);
+            void setPulseWidth(double);
+            void setOscillatorType(wave_type);
+
+            double getPulseWidth() const;
+            double getPitchShift() const;
+            wave_type getOscillatorType() const;
+
         private:
             double nextSample();
             void pitchWheelAdjust(int);
@@ -40,6 +48,7 @@ namespace st1
             double tailOff_{};
             double pitchFrequency_{};
             double pulseWidth_{0.5};
+            double pitchShift_{0.0};
             enum wave_type type_{wave_type::sinusoid};
         };
     }

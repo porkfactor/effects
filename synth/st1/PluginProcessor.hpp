@@ -39,11 +39,13 @@ namespace st1
         void getStateInformation (juce::MemoryBlock&) override;
         void setStateInformation (const void*, int) override;
 
+        juce::AudioProcessorValueTreeState &state();
+
     private:
         static juce::MidiBuffer filterMidiMessagesForChannel(const juce::MidiBuffer &input, int channel);
+        juce::AudioProcessorValueTreeState state_;
 
         juce::OwnedArray<juce::Synthesiser> synth_;
-        juce::SynthesiserSound::Ptr sound;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginProcessor)
     };

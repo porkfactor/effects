@@ -4,10 +4,10 @@
 namespace st1
 {
     PluginEditor::PluginEditor(PluginProcessor &p) :
-        super(p)
+        super(p),
+        oscillator_(p.state(), this)
     {
         super::setOpaque(true);
-        super::addAndMakeVisible(ev_);
 
         super::setResizable(true, false);
         super::setSize(400, 400);
@@ -20,6 +20,7 @@ namespace st1
 
     void PluginEditor::resized(void)
     {
-        ev_.setBounds(super::getLocalBounds());
+        oscillator_.setBounds(super::getLocalBounds());
+        // ev_.setBounds(super::getLocalBounds());
     }
 }
