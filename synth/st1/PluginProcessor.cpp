@@ -7,6 +7,13 @@
 
 namespace st1
 {
+    juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParameters()
+    {
+        return {
+            voices::OscillatorVoice::parameters("oscillator")
+        };
+    }
+
     PluginProcessor::PluginProcessor() :
         AudioProcessor(BusesProperties()
                 .withOutput ("Output #1", juce::AudioChannelSet::stereo(), true)
@@ -26,7 +33,7 @@ namespace st1
                 .withOutput ("Output #15", juce::AudioChannelSet::stereo(), false)
                 .withOutput ("Output #16", juce::AudioChannelSet::stereo(), false)
             ),
-        state_(*this, nullptr)
+        state_(*this, nullptr, "parameters", PluginProcessor::createParameters())
     {
         for (auto midiChannel = 0; midiChannel < maxMidiChannel; ++midiChannel)
         {
@@ -34,7 +41,7 @@ namespace st1
 
             for (auto i = 0; i < maxNumberOfVoices; ++i)
             {
-                synth_[midiChannel]->addVoice(new st1::voices::OscillatorVoice());
+                synth_[midiChannel]->addVoice(new st1::voices::OscillatorVoice(state_));
                 synth_[midiChannel]->addSound(new st1::voices::WavetableSound());
             }
         }

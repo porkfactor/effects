@@ -41,6 +41,8 @@ namespace st1
 
         juce::AudioProcessorValueTreeState &state();
 
+        static juce::AudioProcessorValueTreeState::ParameterLayout createParameters(); 
+
     private:
         static juce::MidiBuffer filterMidiMessagesForChannel(const juce::MidiBuffer &input, int channel);
         juce::AudioProcessorValueTreeState state_;

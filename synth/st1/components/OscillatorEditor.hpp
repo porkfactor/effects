@@ -22,19 +22,8 @@ namespace st1
             struct OscillatorTypeControl : public juce::ComboBox
             {
             public:
-                enum OscillatorType
-                {
-                    SINUSOID = 1,
-                    SQUARE = 2,
-                    SAWTOOTH = 3,
-                    TRIANGLE = 4,
-                };
-
                 OscillatorTypeControl(juce::AudioProcessorValueTreeState &, juce::String const &);
                 ~OscillatorTypeControl();
-
-                static juce::String valueToText(float);
-                static float textToValue(juce::String const &);
 
             private:
                 std::unique_ptr<juce::ComboBoxParameterAttachment> attachment_;
@@ -42,41 +31,8 @@ namespace st1
 
             struct PitchShiftControl : public juce::Slider
             {
-            public:
-                enum class PitchShift : int8_t
-                {
-                    PERFECT_UNISON = 0,
-                    INC_MINOR_2ND = 1,
-                    INC_MAJOR_2ND = 2,
-                    INC_MINOR_3RD = 3,
-                    INC_MAJOR_3RD = 4,
-                    INC_PERFECT_4TH = 5,
-                    INC_DIMINISHED_5TH = 6,
-                    INC_PERFECT_5TH = 7,
-                    INC_MINOR_6TH = 8,
-                    INC_MAJOR_6TH = 9,
-                    INC_MINOR_7TH = 10,
-                    INC_MAJOR_7TH = 11,
-                    INC_PERFECT_OCTAVE = 12,
-                    DEC_MINOR_2ND = -1,
-                    DEC_MAJOR_2ND = -2,
-                    DEC_MINOR_3RD = -3,
-                    DEC_MAJOR_3RD = -4,
-                    DEC_PERFECT_4TH = -5,
-                    DEC_DIMINISHED_5TH = -6,
-                    DEC_PERFECT_5TH = -7,
-                    DEC_MINOR_6TH = -8,
-                    DEC_MAJOR_6TH = -9,
-                    DEC_MINOR_7TH = -10,
-                    DEC_MAJOR_7TH = -11,
-                    DEC_PERFECT_OCTAVE = -12,
-                };
-
                 PitchShiftControl(juce::AudioProcessorValueTreeState &, juce::String const &);
                 ~PitchShiftControl();
-
-                static juce::String valueToText(float);
-                static float textToValue(juce::String const &);
 
             private:
                 std::unique_ptr<juce::SliderParameterAttachment> attachment_;
@@ -87,9 +43,6 @@ namespace st1
             public:
                 PulseWidthControl(juce::AudioProcessorValueTreeState &, juce::String const &);
                 ~PulseWidthControl();
-
-                static juce::String valueToText(float);
-                static float textToValue(juce::String const &);
 
             private:
                 std::unique_ptr<juce::SliderParameterAttachment> attachment_;

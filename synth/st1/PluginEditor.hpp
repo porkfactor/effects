@@ -15,8 +15,6 @@ namespace st1
         public juce::AudioProcessorEditor
     {
     public:
-        using super = juce::AudioProcessorEditor;
-
         PluginEditor(PluginProcessor &);
 
         void paint(juce::Graphics &) override;

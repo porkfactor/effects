@@ -8,7 +8,8 @@ namespace st1
     namespace voices
     {
         class OscillatorVoice :
-            public juce::SynthesiserVoice
+            public juce::SynthesiserVoice,
+            public juce::AudioProcessorValueTreeState::Listener
         {
         public:
             enum class wave_type
@@ -19,8 +20,11 @@ namespace st1
                 square,
             };
 
-            OscillatorVoice();
+            OscillatorVoice(juce::AudioProcessorValueTreeState &);
+            ~OscillatorVoice() override;
     
+            void parameterChanged(juce::String const&parameterID, float newValue) override;
+
             bool canPlaySound(juce::SynthesiserSound *) override;
             void startNote(int, float, juce::SynthesiserSound *, int) override;
             void stopNote(float, bool) override;
@@ -36,12 +40,15 @@ namespace st1
             double getPitchShift() const;
             wave_type getOscillatorType() const;
 
+            static std::unique_ptr<juce::AudioProcessorParameterGroup> parameters(juce::String const &);
+
         private:
             double nextSample();
             void pitchWheelAdjust(int);
 
             void reset();
 
+            juce::AudioProcessorValueTreeState &state_;
             double velocity_{};
             double delta_{};
             double modulo_{};
