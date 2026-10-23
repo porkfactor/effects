@@ -1,12 +1,12 @@
-#ifndef ST1_COMPONENTS_ENVELOPE_VISUALIZER_HPP_
-#define ST1_COMPONENTS_ENVELOPE_VISUALIZER_HPP_
+#ifndef ST1_COMPONENTS_ENVELOPE_EDITOR_HPP_
+#define ST1_COMPONENTS_ENVELOPE_EDITOR_HPP_
 
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 
 namespace st1
 {
-    namespace gui
+    namespace components
     {
         template<typename _Unit>
         class EnvelopeSegment
@@ -52,12 +52,12 @@ namespace st1
             line_type type_{line_type::linear};
         };
 
-        class EnvelopeVisualizer :
+        class EnvelopeEditor :
             public juce::Component
         {
         public:
             static constexpr std::size_t npos = static_cast<std::size_t>(-1);
-            EnvelopeVisualizer();
+            EnvelopeEditor();
 
             void mouseEnter(juce::MouseEvent const &e) override;
             void mouseExit(juce::MouseEvent const &e) override;

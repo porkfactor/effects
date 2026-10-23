@@ -4,8 +4,8 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "components/EnvelopeVisualizer.hpp"
-#include "components/OscillatorEditor.hpp"
+#include "components/EnvelopeEditor.hpp"
+#include "components/OscillatorGroup.hpp"
 
 namespace st1
 {
@@ -21,7 +21,7 @@ namespace st1
         void resized() override;
 
     private:
-        gui::OscillatorEditor oscillator_;
+        components::OscillatorGroup oscillator_;
 
         // gui::EnvelopeVisualizer ev_;
     };

@@ -1,10 +1,10 @@
-#include "EnvelopeVisualizer.hpp"
+#include "EnvelopeEditor.hpp"
 
 namespace st1
 {
-    namespace gui
+    namespace components
     {
-        EnvelopeVisualizer::EnvelopeVisualizer()
+        EnvelopeEditor::EnvelopeEditor()
         {
             segments_.push_back({ 50.0f,  150.0f });
             segments_.push_back({ 150.0f, 50.0f  });
@@ -12,7 +12,7 @@ namespace st1
             segments_.push_back({ 350.0f, 150.0f });
         }
 
-        void EnvelopeVisualizer::paint(juce::Graphics &g)
+        void EnvelopeEditor::paint(juce::Graphics &g)
         {
             g.fillAll(juce::Colours::darkgrey);
 
@@ -43,12 +43,12 @@ namespace st1
             }
         }
 
-        void EnvelopeVisualizer::mouseEnter(juce::MouseEvent const &e)
+        void EnvelopeEditor::mouseEnter(juce::MouseEvent const &e)
         {
 
         }
 
-        void EnvelopeVisualizer::mouseExit(juce::MouseEvent const &e)
+        void EnvelopeEditor::mouseExit(juce::MouseEvent const &e)
         {
             if (grabbed_)
             {
@@ -59,7 +59,7 @@ namespace st1
             selected_ = npos;
         }
 
-        void EnvelopeVisualizer::mouseMove(juce::MouseEvent const &e)
+        void EnvelopeEditor::mouseMove(juce::MouseEvent const &e)
         {
             std::size_t selected = npos;
 
@@ -79,7 +79,7 @@ namespace st1
             }
         }
 
-        void EnvelopeVisualizer::mouseDrag(juce::MouseEvent const &e)
+        void EnvelopeEditor::mouseDrag(juce::MouseEvent const &e)
         {
             if (grabbed_ && (selected_ != npos))
             {
@@ -93,7 +93,7 @@ namespace st1
             }
         }
 
-        void EnvelopeVisualizer::mouseDown(juce::MouseEvent const &e)
+        void EnvelopeEditor::mouseDown(juce::MouseEvent const &e)
         {
             if (selected_ != npos)
             {
@@ -102,7 +102,7 @@ namespace st1
             }
         }
 
-        void EnvelopeVisualizer::mouseUp(juce::MouseEvent const &e)
+        void EnvelopeEditor::mouseUp(juce::MouseEvent const &e)
         {
             if (selected_ != npos)
             {

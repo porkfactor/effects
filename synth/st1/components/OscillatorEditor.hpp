@@ -1,5 +1,5 @@
-#ifndef ST1_GUI_OSCILLATOR_EDITOR_HPP_
-#define ST1_GUI_OSCILLATOR_EDITOR_HPP_
+#ifndef ST1_COMPONENTS_OSCILLATOR_EDITOR_HPP_
+#define ST1_COMPONENTS_OSCILLATOR_EDITOR_HPP_
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
@@ -7,13 +7,13 @@
 
 namespace st1
 {
-    namespace gui
+    namespace components
     {
         class OscillatorEditor :
             public juce::Component
         {
         public:
-            OscillatorEditor(juce::AudioProcessorValueTreeState &, juce::Component *);
+            OscillatorEditor(juce::AudioProcessorValueTreeState &, juce::String const &);
 
             void resized() override;
             void paint(juce::Graphics &) override;
@@ -48,7 +48,6 @@ namespace st1
                 std::unique_ptr<juce::SliderParameterAttachment> attachment_;
             };
 
-            juce::Component *parent_;
             OscillatorTypeControl oscillatorTypeControl_;
             PitchShiftControl pitchShiftControl_;
             PulseWidthControl pulseWidthControl_;

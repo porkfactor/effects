@@ -2,7 +2,7 @@
 
 namespace st1
 {
-    namespace gui
+    namespace components
     {
         OscillatorEditor::OscillatorTypeControl::OscillatorTypeControl(juce::AudioProcessorValueTreeState &s, juce::String const &name) :
             ComboBox(name)
@@ -53,17 +53,15 @@ namespace st1
         OscillatorEditor::PulseWidthControl::~PulseWidthControl()
         {}
 
-        OscillatorEditor::OscillatorEditor(juce::AudioProcessorValueTreeState &s, juce::Component *p) :
-            parent_(p),
+        OscillatorEditor::OscillatorEditor(juce::AudioProcessorValueTreeState &s, juce::String const &name) :
+            Component(name),
             oscillatorTypeControl_(s, "Oscillator Type"),
             pitchShiftControl_(s, "Pitch Shift"),
             pulseWidthControl_(s, "Pulse Width")
         {
-            this->addAndMakeVisible(oscillatorTypeControl_);
-            this->addAndMakeVisible(pitchShiftControl_);
-            this->addAndMakeVisible(pulseWidthControl_);
-
-            parent_->addAndMakeVisible(*this);
+            Component::addAndMakeVisible(oscillatorTypeControl_);
+            Component::addAndMakeVisible(pitchShiftControl_);
+            Component::addAndMakeVisible(pulseWidthControl_);
         }
 
         void OscillatorEditor::resized(void)

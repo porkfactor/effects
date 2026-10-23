@@ -53,10 +53,12 @@ namespace st1
 
     PluginEditor::PluginEditor(PluginProcessor &p) :
         juce::AudioProcessorEditor(p),
-        oscillator_(p.state(), this)
+        oscillator_(p.state(), "oscillator", "Oscillator A")
     {
         AudioProcessorEditor::setLookAndFeel(&SpicyLookAndFeel::instance());
         AudioProcessorEditor::getLookAndFeel();
+
+        AudioProcessorEditor::addAndMakeVisible(oscillator_);
 
         AudioProcessorEditor::setOpaque(true);
         AudioProcessorEditor::setResizable(true, false);
