@@ -2,6 +2,7 @@
 #include "PluginEditor.hpp"
 
 #include "voices/OscillatorVoice.hpp"
+#include "filters/EnvelopeGenerator.hpp"
 #include "voices/WavetableVoice.hpp"
 #include "voices/WavetableSound.hpp"
 
@@ -10,12 +11,14 @@ namespace st1
     juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParameters()
     {
         return {
-            voices::OscillatorVoice::parameters("oscillator")
+            voices::OscillatorVoice::parameters("oscillator"),
+            filters::EnvelopeGenerator::parameters("envelope")
         };
     }
 
     PluginProcessor::PluginProcessor() :
-        AudioProcessor(BusesProperties()
+        AudioProcessor(
+            BusesProperties()
                 .withOutput ("Output #1", juce::AudioChannelSet::stereo(), true)
                 .withOutput ("Output #2", juce::AudioChannelSet::stereo(), false)
                 .withOutput ("Output #3", juce::AudioChannelSet::stereo(), false)

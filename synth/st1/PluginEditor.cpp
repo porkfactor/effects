@@ -53,12 +53,14 @@ namespace st1
 
     PluginEditor::PluginEditor(PluginProcessor &p) :
         juce::AudioProcessorEditor(p),
-        oscillator_(p.state(), "oscillator", "Oscillator A")
+        oscillator_(p.state(), "oscillator", "Oscillator A"),
+        envelope_(p.state(), "envelope", "Envelope")
     {
         AudioProcessorEditor::setLookAndFeel(&SpicyLookAndFeel::instance());
         AudioProcessorEditor::getLookAndFeel();
 
         AudioProcessorEditor::addAndMakeVisible(oscillator_);
+        AudioProcessorEditor::addAndMakeVisible(envelope_);
 
         AudioProcessorEditor::setOpaque(true);
         AudioProcessorEditor::setResizable(true, false);
@@ -72,7 +74,9 @@ namespace st1
 
     void PluginEditor::resized(void)
     {
-        oscillator_.setBounds(AudioProcessorEditor::getLocalBounds());
-        // ev_.setBounds(super::getLocalBounds());
+        auto bounds = AudioProcessorEditor::getLocalBounds();
+
+        oscillator_.setBounds(bounds.removeFromTop(bounds.getHeight() / 2));
+        envelope_.setBounds(bounds);
     }
 }

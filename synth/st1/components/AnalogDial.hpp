@@ -9,36 +9,46 @@ namespace st1
     namespace components
     {
         class AnalogDial :
-            public juce::Slider
+            public juce::Component
         {
         public:
-            AnalogDial(juce::String const &name) :
-                juce::Slider(name)
+            AnalogDial(juce::String const &name, juce::String const &label = juce::String()) :
+                juce::Component(name),
+                slider_(name + ".slider"),
+                label_(name + ".label", label)
             {
-                juce::Slider::setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-                juce::Slider::setTextBoxStyle(juce::Slider::TextBoxBelow, true, 80, 20);
+                slider_.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+                slider_.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 80, 20);
+                label_.setJustificationType(juce::Justification::centred);
+
+                Component::addAndMakeVisible(slider_);
+                Component::addAndMakeVisible(label_);
             }
 
-        private:
-        };
+            void resized(void) override
+            {
+                auto bounds = Component::getLocalBounds();
 
-        class AttachedAnalogDial :
-            public AnalogDial
-        {
-        public:
-            AttachedAnalogDial(juce::RangedAudioParameter *parameter, juce::String const &name, juce::UndoManager *undoManager = nullptr) :
-                AnalogDial(name)
+                label_.setBounds(bounds.removeFromTop(20));
+                slider_.setBounds(bounds);
+            }
+
+            void attach(juce::RangedAudioParameter *parameter, juce::UndoManager *undoManager = nullptr)
             {
                 if (parameter)
                 {
-                    attachment_.reset(new juce::SliderParameterAttachment(*parameter, *this, undoManager));
+                    attachment_.reset(new juce::SliderParameterAttachment(*parameter, slider_, undoManager));
                 }
             }
 
-            ~AttachedAnalogDial() override
-            {}
+            void attach(juce::AudioProcessorValueTreeState &s, juce::StringRef parameterId)
+            {
+                attach(s.getParameter(parameterId), s.undoManager);
+            }
 
         private:
+            juce::Slider slider_;
+            juce::Label label_;
             std::unique_ptr<juce::SliderParameterAttachment> attachment_;
         };
     }

@@ -6,11 +6,15 @@ namespace st1
     {
         OscillatorEditor::OscillatorEditor(juce::AudioProcessorValueTreeState &s, juce::String const &name) :
             Component(name),
-            oscillatorTypeCombo_(s.getParameter("OCOT"), "Oscillator Type"),
-            pitchShiftDial_(s.getParameter("OFPS"), "Pitch Shift"),
-            pulseWidthDial_(s.getParameter("OFPW"), "Pulse Width"),
-            amplitudeDial_(s.getParameter("OFAM"), "Amplitude")
+            oscillatorTypeCombo_(s.getParameter("OCOT"), name + ".oscillator_type", s.undoManager),
+            pitchShiftDial_(name + ".pitch_shift", "Pitch Shift"),
+            pulseWidthDial_(name + ".pulse_width", "Pulse Width"),
+            amplitudeDial_(name + ".amplitude", "Amplitude")
         {
+            pitchShiftDial_.attach(s, "OFPS");
+            pulseWidthDial_.attach(s, "OFPW");
+            amplitudeDial_.attach(s, "OFAM");
+
             Component::addAndMakeVisible(oscillatorTypeCombo_);
             Component::addAndMakeVisible(pitchShiftDial_);
             Component::addAndMakeVisible(pulseWidthDial_);
@@ -20,16 +24,13 @@ namespace st1
         void OscillatorEditor::resized(void)
         {
             auto bounds = Component::getLocalBounds();
+            auto width = bounds.getWidth();
 
             oscillatorTypeCombo_.setBounds(bounds.removeFromTop(30));
-            pitchShiftDial_.setBounds(bounds.removeFromLeft(bounds.getWidth() / 3));
-            pulseWidthDial_.setBounds(bounds.removeFromLeft(bounds.getWidth() / 2));
-            amplitudeDial_.setBounds(bounds);
-        }
 
-        void OscillatorEditor::paint(juce::Graphics &g)
-        {
-            g.fillAll(Component::getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+            pitchShiftDial_.setBounds(bounds.removeFromLeft(width / 3));
+            pulseWidthDial_.setBounds(bounds.removeFromLeft(width / 3));
+            amplitudeDial_.setBounds(bounds.removeFromLeft(width / 3));
         }
     }
 }

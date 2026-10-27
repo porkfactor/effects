@@ -17,7 +17,6 @@ namespace st1
             OscillatorEditor(juce::AudioProcessorValueTreeState &, juce::String const &);
 
             void resized() override;
-            void paint(juce::Graphics &) override;
 
         private:
             class OscillatorTypeCombo :
@@ -41,27 +40,27 @@ namespace st1
                 std::unique_ptr<juce::ComboBoxParameterAttachment> attachment_;
             };
 
-            class PitchShiftDial : public AttachedAnalogDial
+            class PitchShiftDial : public AnalogDial
             {
             public:
-                PitchShiftDial(juce::RangedAudioParameter *parameter, juce::String const &name, juce::UndoManager *undoManager = nullptr) :
-                    AttachedAnalogDial(parameter, name, undoManager)
+                PitchShiftDial(juce::String const &name, juce::String const &label) :
+                    AnalogDial(name, label)
                 {}
             };
 
-            class PulseWidthDial : public AttachedAnalogDial
+            class PulseWidthDial : public AnalogDial
             {
             public:
-                PulseWidthDial(juce::RangedAudioParameter *parameter, juce::String const &name, juce::UndoManager *undoManager = nullptr) :
-                    AttachedAnalogDial(parameter, name, undoManager)
+                PulseWidthDial(juce::String const &name, juce::String const &label) :
+                    AnalogDial(name, label)
                 {}
             };
 
-            class AmplitudeDial : public AttachedAnalogDial
+            class AmplitudeDial : public AnalogDial
             {
             public:
-                AmplitudeDial(juce::RangedAudioParameter *parameter, juce::String const &name, juce::UndoManager *undoManager = nullptr) :
-                    AttachedAnalogDial(parameter, name, undoManager)
+                AmplitudeDial(juce::String const &name, juce::String const &label) :
+                    AnalogDial(name, label)
                 {}
             };
 

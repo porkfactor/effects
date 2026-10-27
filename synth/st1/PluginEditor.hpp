@@ -4,7 +4,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "components/EnvelopeEditor.hpp"
+#include "components/EnvelopeGroup.hpp"
 #include "components/OscillatorGroup.hpp"
 
 namespace st1
@@ -22,8 +22,7 @@ namespace st1
 
     private:
         components::OscillatorGroup oscillator_;
-
-        // gui::EnvelopeVisualizer ev_;
+        components::EnvelopeGroup envelope_;
     };
 }
 

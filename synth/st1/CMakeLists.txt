@@ -25,6 +25,7 @@ set(SOURCES
 )
 
 add_subdirectory(voices)
+add_subdirectory(filters)
 add_subdirectory(components)
 
 target_sources(st1

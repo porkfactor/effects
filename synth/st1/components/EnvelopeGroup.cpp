@@ -8,7 +8,7 @@ namespace st1
             GroupComponent(name, title),
             envelope_(s, name + ".envelope")
         {
-
+            GroupComponent::addAndMakeVisible(envelope_);
         }
 
         EnvelopeGroup::~EnvelopeGroup()

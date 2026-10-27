@@ -20,32 +20,41 @@ namespace st1
             void resized(void) override;
 
         private:
-            class AttackDial : public AttachedAnalogDial
+            class AttackDial : public AnalogDial
             {
             public:
-                AttackDial(juce::RangedAudioParameter *parameter, juce::String const &name, juce::UndoManager *undoManager = nullptr) :
-                    AttachedAnalogDial(parameter, name, undoManager)
+                AttackDial(juce::String const &name, juce::String const &label) :
+                    AnalogDial(name, label)
                 {}
             };
 
-            class DecayDial : public AttachedAnalogDial
+            class DecayDial : public AnalogDial
             {
             public:
-                DecayDial(juce::RangedAudioParameter *parameter, juce::String const &name, juce::UndoManager *undoManager = nullptr) :
-                    AttachedAnalogDial(parameter, name, undoManager)
+                DecayDial(juce::String const &name, juce::String const &label) :
+                    AnalogDial(name, label)
                 {}
             };
 
-            class ReleaseDial : public AttachedAnalogDial
+            class SustainDial : public AnalogDial
             {
             public:
-                ReleaseDial(juce::RangedAudioParameter *parameter, juce::String const &name, juce::UndoManager *undoManager = nullptr) :
-                    AttachedAnalogDial(parameter, name, undoManager)
+                SustainDial(juce::String const &name, juce::String const &label) :
+                    AnalogDial(name, label)
+                {}
+            };
+
+            class ReleaseDial : public AnalogDial
+            {
+            public:
+                ReleaseDial(juce::String const &name, juce::String const &label) :
+                    AnalogDial(name, label)
                 {}
             };
 
             AttackDial attackDial_;
             DecayDial decayDial_;
+            SustainDial sustainDial_;
             ReleaseDial releaseDial_;
         };
     }
