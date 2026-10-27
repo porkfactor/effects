@@ -3,7 +3,8 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
-#include <juce_gui_extra/juce_gui_extra.h>
+
+#include "AnalogDial.hpp"
 
 namespace st1
 {
@@ -19,38 +20,55 @@ namespace st1
             void paint(juce::Graphics &) override;
 
         private:
-            struct OscillatorTypeControl : public juce::ComboBox
+            class OscillatorTypeCombo :
+                public juce::ComboBox
             {
             public:
-                OscillatorTypeControl(juce::AudioProcessorValueTreeState &, juce::String const &);
-                ~OscillatorTypeControl();
+                OscillatorTypeCombo(juce::RangedAudioParameter *parameter, juce::String const &name, juce::UndoManager *undoManager = nullptr) :
+                    ComboBox(name)
+                {
+                    if (parameter)
+                    {
+                        ComboBox::addItemList(parameter->getAllValueStrings(), 1);
+                        attachment_.reset(new juce::ComboBoxParameterAttachment(*parameter, *this, undoManager));
+                    }
+                }
+        
+                ~OscillatorTypeCombo()
+                {}
 
             private:
                 std::unique_ptr<juce::ComboBoxParameterAttachment> attachment_;
             };
 
-            struct PitchShiftControl : public juce::Slider
-            {
-                PitchShiftControl(juce::AudioProcessorValueTreeState &, juce::String const &);
-                ~PitchShiftControl();
-
-            private:
-                std::unique_ptr<juce::SliderParameterAttachment> attachment_;
-            };
-
-            struct PulseWidthControl : public juce::Slider
+            class PitchShiftDial : public AttachedAnalogDial
             {
             public:
-                PulseWidthControl(juce::AudioProcessorValueTreeState &, juce::String const &);
-                ~PulseWidthControl();
-
-            private:
-                std::unique_ptr<juce::SliderParameterAttachment> attachment_;
+                PitchShiftDial(juce::RangedAudioParameter *parameter, juce::String const &name, juce::UndoManager *undoManager = nullptr) :
+                    AttachedAnalogDial(parameter, name, undoManager)
+                {}
             };
 
-            OscillatorTypeControl oscillatorTypeControl_;
-            PitchShiftControl pitchShiftControl_;
-            PulseWidthControl pulseWidthControl_;
+            class PulseWidthDial : public AttachedAnalogDial
+            {
+            public:
+                PulseWidthDial(juce::RangedAudioParameter *parameter, juce::String const &name, juce::UndoManager *undoManager = nullptr) :
+                    AttachedAnalogDial(parameter, name, undoManager)
+                {}
+            };
+
+            class AmplitudeDial : public AttachedAnalogDial
+            {
+            public:
+                AmplitudeDial(juce::RangedAudioParameter *parameter, juce::String const &name, juce::UndoManager *undoManager = nullptr) :
+                    AttachedAnalogDial(parameter, name, undoManager)
+                {}
+            };
+
+            OscillatorTypeCombo oscillatorTypeCombo_;
+            PitchShiftDial pitchShiftDial_;
+            PulseWidthDial pulseWidthDial_;
+            AmplitudeDial amplitudeDial_;
         };
     }
 }

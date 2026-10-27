@@ -1,84 +1,54 @@
 #ifndef ST1_COMPONENTS_ENVELOPE_EDITOR_HPP_
 #define ST1_COMPONENTS_ENVELOPE_EDITOR_HPP_
 
+#include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
-#include <juce_gui_extra/juce_gui_extra.h>
+
+#include "AnalogDial.hpp"
+#include "EnvelopeVisualizer.hpp"
 
 namespace st1
 {
     namespace components
     {
-        template<typename _Unit>
-        class EnvelopeSegment
-        {
-        public:
-            using value_type = _Unit;
-
-            enum line_type
-            {
-                linear,
-                quadratic,
-            };
-
-            EnvelopeSegment(value_type, value_type)
-            {
-
-            }
-
-            EnvelopeSegment(value_type, value_type, value_type, value_type)
-            {
-                
-            }
-
-            inline juce::Point<value_type> const &start() const noexcept
-            {
-                return start_;
-            }
-
-            inline juce::Point<value_type> const &end() const noexcept
-            {
-                return end_;
-            }
-
-            inline juce::Point<value_type> const &intercept() const noexcept
-            {
-                return intercept_;
-            }
-
-        private:
-            juce::Point<value_type> start_;
-            juce::Point<value_type> end_;
-            juce::Point<value_type> intercept_;
-            line_type type_{line_type::linear};
-        };
-
         class EnvelopeEditor :
             public juce::Component
         {
         public:
-            static constexpr std::size_t npos = static_cast<std::size_t>(-1);
-            EnvelopeEditor();
+            EnvelopeEditor(juce::AudioProcessorValueTreeState &, juce::String const &);
 
-            void mouseEnter(juce::MouseEvent const &e) override;
-            void mouseExit(juce::MouseEvent const &e) override;
-
-            void mouseDown(juce::MouseEvent const &e) override;
-            void mouseUp(juce::MouseEvent const &e) override;
-            void mouseDrag(juce::MouseEvent const &e) override;
-            void mouseMove(juce::MouseEvent const &e) override;
-
-            void paint(juce::Graphics &) override;
+            void resized(void) override;
 
         private:
-            std::vector<EnvelopeSegment<float>> segments_;
-            std::size_t selected_ = npos;
-            bool grabbed_ = false;
-    
-            const float anchorRadius = 6.0f;
-            const float grabTolerance = 15.0f; // Click target radius padding
+            class AttackDial : public AttachedAnalogDial
+            {
+            public:
+                AttackDial(juce::RangedAudioParameter *parameter, juce::String const &name, juce::UndoManager *undoManager = nullptr) :
+                    AttachedAnalogDial(parameter, name, undoManager)
+                {}
+            };
+
+            class DecayDial : public AttachedAnalogDial
+            {
+            public:
+                DecayDial(juce::RangedAudioParameter *parameter, juce::String const &name, juce::UndoManager *undoManager = nullptr) :
+                    AttachedAnalogDial(parameter, name, undoManager)
+                {}
+            };
+
+            class ReleaseDial : public AttachedAnalogDial
+            {
+            public:
+                ReleaseDial(juce::RangedAudioParameter *parameter, juce::String const &name, juce::UndoManager *undoManager = nullptr) :
+                    AttachedAnalogDial(parameter, name, undoManager)
+                {}
+            };
+
+            AttackDial attackDial_;
+            DecayDial decayDial_;
+            ReleaseDial releaseDial_;
         };
     }
 }
-
 
 #endif

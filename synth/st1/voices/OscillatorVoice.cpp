@@ -111,6 +111,31 @@ namespace st1
         private:
         };
 
+        class AmplitudeParameter
+        {
+        public:
+            static juce::String const identifier()
+            {
+                static juce::String const identifier_ = "OFAM";
+                return identifier_;
+            }
+
+            static std::unique_ptr<juce::AudioParameterFloat> create(juce::String const &name)
+            {
+                return std::make_unique<juce::AudioParameterFloat>(
+                    juce::ParameterID(identifier(), 1),
+                    name,
+                    juce::NormalisableRange<float>(static_cast<float>(0.0), static_cast<float>(1.0), 0.1),
+                    1.0,
+                    juce::AudioParameterFloatAttributes()
+                        .withLabel("Amplitude")
+                        .withCategory(juce::AudioProcessorParameter::Category::genericParameter)
+                );
+            }
+
+        private:
+        };
+
         class PulseWidthParameter
         {
         public:
@@ -126,9 +151,9 @@ namespace st1
                     juce::ParameterID(identifier(), 1),
                     name,
                     juce::NormalisableRange<float>(static_cast<float>(0.0), static_cast<float>(100.0), 1.0),
-                    0.0,
+                    50.0,
                     juce::AudioParameterFloatAttributes()
-                        .withLabel("")
+                        .withLabel("Pulse Width")
                         .withCategory(juce::AudioProcessorParameter::Category::genericParameter)
                 );
             }
@@ -184,7 +209,7 @@ namespace st1
                         1.0),
                     0.0,
                     juce::AudioParameterFloatAttributes()
-                        .withLabel("")
+                        .withLabel("Pitch Shift")
                         .withCategory(juce::AudioProcessorParameter::Category::genericParameter)
                         .withStringFromValueFunction(std::bind(&PitchShiftParameter::stringFromValue, std::placeholders::_1))
                         .withValueFromStringFunction(std::bind(&PitchShiftParameter::valueFromString, std::placeholders::_1))
@@ -276,7 +301,8 @@ namespace st1
                 juce::String("|"),
                 OscillatorTypeParameter::create("oscillator_type"),
                 PitchShiftParameter::create("pitch_shift"),
-                PulseWidthParameter::create("pulse_width")
+                PulseWidthParameter::create("pulse_width"),
+                AmplitudeParameter::create("amplitude")
             );
         }
 
@@ -287,6 +313,7 @@ namespace st1
             state_.addParameterListener(OscillatorTypeParameter::identifier(), this);
             state_.addParameterListener(PitchShiftParameter::identifier(), this);
             state_.addParameterListener(PulseWidthParameter::identifier(), this);
+            state_.addParameterListener(AmplitudeParameter::identifier(), this);
         }
 
         OscillatorVoice::~OscillatorVoice()
@@ -294,6 +321,7 @@ namespace st1
             state_.removeParameterListener(OscillatorTypeParameter::identifier(), this);
             state_.removeParameterListener(PitchShiftParameter::identifier(), this);
             state_.removeParameterListener(PulseWidthParameter::identifier(), this);
+            state_.removeParameterListener(AmplitudeParameter::identifier(), this);
         }
 
         void OscillatorVoice::parameterChanged(juce::String const&parameterID, float newValue)

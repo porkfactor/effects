@@ -4,73 +4,27 @@ namespace st1
 {
     namespace components
     {
-        OscillatorEditor::OscillatorTypeControl::OscillatorTypeControl(juce::AudioProcessorValueTreeState &s, juce::String const &name) :
-            ComboBox(name)
-        {
-            auto parameter = s.getParameter("OCOT");
-
-            if (parameter)
-            {
-                ComboBox::addItemList(parameter->getAllValueStrings(), 1);
-                attachment_.reset(new juce::ComboBoxParameterAttachment(*parameter, *this, s.undoManager));
-            }
-        }
-
-        OscillatorEditor::OscillatorTypeControl::~OscillatorTypeControl()
-        {}
-
-        OscillatorEditor::PitchShiftControl::PitchShiftControl(juce::AudioProcessorValueTreeState &s, juce::String const &name) :
-            Slider(name)
-        {
-            juce::Slider::setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-            juce::Slider::setTextBoxStyle(juce::Slider::TextBoxBelow, true, 80, 20);
-
-            auto parameter = s.getParameter("OFPS");
-
-            if (parameter)
-            {
-                attachment_.reset(new juce::SliderParameterAttachment(*parameter, *this, s.undoManager));
-            }
-        }
-
-        OscillatorEditor::PitchShiftControl::~PitchShiftControl()
-        {}
-
-        OscillatorEditor::PulseWidthControl::PulseWidthControl(juce::AudioProcessorValueTreeState &s, juce::String const &name) :
-            Slider(name)
-        {
-            juce::Slider::setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-            juce::Slider::setTextBoxStyle(juce::Slider::TextBoxBelow, true, 80, 20);
-
-            auto parameter = s.getParameter("OFPW");
-
-            if (parameter)
-            {
-                attachment_.reset(new juce::SliderParameterAttachment(*parameter, *this, s.undoManager));
-            }
-        }
-
-        OscillatorEditor::PulseWidthControl::~PulseWidthControl()
-        {}
-
         OscillatorEditor::OscillatorEditor(juce::AudioProcessorValueTreeState &s, juce::String const &name) :
             Component(name),
-            oscillatorTypeControl_(s, "Oscillator Type"),
-            pitchShiftControl_(s, "Pitch Shift"),
-            pulseWidthControl_(s, "Pulse Width")
+            oscillatorTypeCombo_(s.getParameter("OCOT"), "Oscillator Type"),
+            pitchShiftDial_(s.getParameter("OFPS"), "Pitch Shift"),
+            pulseWidthDial_(s.getParameter("OFPW"), "Pulse Width"),
+            amplitudeDial_(s.getParameter("OFAM"), "Amplitude")
         {
-            Component::addAndMakeVisible(oscillatorTypeControl_);
-            Component::addAndMakeVisible(pitchShiftControl_);
-            Component::addAndMakeVisible(pulseWidthControl_);
+            Component::addAndMakeVisible(oscillatorTypeCombo_);
+            Component::addAndMakeVisible(pitchShiftDial_);
+            Component::addAndMakeVisible(pulseWidthDial_);
+            Component::addAndMakeVisible(amplitudeDial_);
         }
 
         void OscillatorEditor::resized(void)
         {
-            auto bounds = Component::getBounds();
+            auto bounds = Component::getLocalBounds();
 
-            oscillatorTypeControl_.setBounds(bounds.removeFromTop(30));
-            pitchShiftControl_.setBounds(bounds.removeFromRight(bounds.getWidth() / 2));
-            pulseWidthControl_.setBounds(bounds);
+            oscillatorTypeCombo_.setBounds(bounds.removeFromTop(30));
+            pitchShiftDial_.setBounds(bounds.removeFromLeft(bounds.getWidth() / 3));
+            pulseWidthDial_.setBounds(bounds.removeFromLeft(bounds.getWidth() / 2));
+            amplitudeDial_.setBounds(bounds);
         }
 
         void OscillatorEditor::paint(juce::Graphics &g)

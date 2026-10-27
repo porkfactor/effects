@@ -13,7 +13,11 @@ namespace st1
 
         void OscillatorGroup::resized(void)
         {
-            oscillator_.setBounds(GroupComponent::getBounds().reduced(40));
+            /**
+             * the base OscillatorGroup component doesn't propagate the drawing
+             * space to the child for some reason.
+             */
+            oscillator_.setBounds(GroupComponent::getLocalBounds().reduced(20));
         }
     }
 }
