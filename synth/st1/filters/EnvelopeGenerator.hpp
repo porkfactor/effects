@@ -8,7 +8,7 @@ namespace st1
 {
     namespace filters
     {
-        class EnvelopeGenerator
+        class Envelope
         {
         public:
             enum class envelope_state
@@ -21,22 +21,9 @@ namespace st1
                 shutdown,
             };
 
-            EnvelopeGenerator();
-            ~EnvelopeGenerator();
-
-            static std::unique_ptr<juce::AudioProcessorParameterGroup> parameters(juce::String const &);
-
-            template<typename _Type>
-            void process(juce::AudioBuffer<_Type> &buffer);
-
-            void signalStart(void)
+            bool active() const noexcept
             {
-                start();
-            }
-
-            void signalEnd(void)
-            {
-                stop();
+                return state_ != envelope_state::initial;
             }
 
             void set_mode(void)
@@ -76,6 +63,11 @@ namespace st1
                     reset();
                     state_ = envelope_state::attack;
                     break;
+                case envelope_state::attack:
+                case envelope_state::decay:
+                case envelope_state::sustain:
+                case envelope_state::shutdown:
+                    break;
                 }
             }
 
@@ -87,6 +79,10 @@ namespace st1
                 case envelope_state::decay:
                 case envelope_state::sustain:
                     state_ = envelope_state::release;
+                    break;
+                case envelope_state::initial:
+                case envelope_state::release:
+                case envelope_state::shutdown:
                     break;
                 }
             }
@@ -164,8 +160,8 @@ namespace st1
                 void configure(double sample_rate, double tco, double distance)
                 {
                     double sample_count = sample_rate * (duration_ / 1000.0);
-                    coefficient_ = std::exp(-std::log((1.0 + tco_) / tco_) / sample_count);
-                    offset_ = (distance + tco_) * (1.0 - coefficient_);
+                    coefficient_ = std::exp(-std::log((1.0 + tco) / tco) / sample_count);
+                    offset_ = (distance + tco) * (1.0 - coefficient_);
                 }
 
                 inline double perform(double x)
@@ -174,7 +170,6 @@ namespace st1
                 }
 
                 double duration_;
-                double tco_;
                 double offset_;
                 double coefficient_;
             };
@@ -184,8 +179,8 @@ namespace st1
                 void configure(double sample_rate, double tco, double distance)
                 {
                     double sample_count = sample_rate * (duration_ / 1000.0);
-                    coefficient_ = std::exp(-std::log((1.0 + tco_) / tco_) / sample_count);
-                    offset_ = (distance - tco_) * (1.0 - coefficient_);
+                    coefficient_ = std::exp(-std::log((1.0 + tco) / tco) / sample_count);
+                    offset_ = (distance - tco) * (1.0 - coefficient_);
                 }
 
                 inline double perform(double x)
@@ -194,7 +189,6 @@ namespace st1
                 }
 
                 double duration_;
-                double tco_;
                 double offset_;
                 double coefficient_;
             };
@@ -204,12 +198,16 @@ namespace st1
             public:
                 void configure(double sample_rate, double tco, double distance)
                 {
+                    (void)sample_rate;
+                    (void)tco;
+                    (void)distance;
+
                     level_ = distance;
                 }
 
                 inline double perform(double x)
                 {
-                    return level_;
+                    return level_ * x;
                 }
 
                 inline double level() const noexcept
@@ -225,9 +223,11 @@ namespace st1
             {
                 void configure(double sample_rate, double tco, double distance)
                 {
+                    (void)distance;
+
                     double sample_count = sample_rate * (duration_ / 1000.0);
-                    coefficient_ = std::exp(-std::log((1.0 + tco_) / tco_) / sample_count);
-                    offset_ = (-tco_) * (1.0 - coefficient_);
+                    coefficient_ = std::exp(-std::log((1.0 + tco) / tco) / sample_count);
+                    offset_ = (-tco) * (1.0 - coefficient_);
                 }
 
                 inline double perform(double x)
@@ -236,7 +236,6 @@ namespace st1
                 }
 
                 double duration_;
-                double tco_;
                 double offset_;
                 double coefficient_;
             };
@@ -270,6 +269,49 @@ namespace st1
             struct shutdown shutdown_;
 
             bool reset_{false};
+        };
+
+        class EnvelopeGenerator :
+            public juce::AudioProcessorValueTreeState::Listener
+        {
+        public:
+            EnvelopeGenerator(juce::AudioProcessorValueTreeState &s);
+            ~EnvelopeGenerator() override;
+
+            static std::unique_ptr<juce::AudioProcessorParameterGroup> parameters(juce::String const &);
+
+            void startNote(void) noexcept
+            {
+                envelope_.start();
+            }
+
+            void stopNote(void) noexcept
+            {
+                envelope_.stop();
+            }
+
+            void reset(void) noexcept
+            {
+                envelope_.reset();
+            }
+
+            bool active(void) const noexcept
+            {
+                // return envelope_.active();
+                return true;
+            }
+
+            inline double process(void) noexcept
+            {
+                // return envelope_.generate();
+                return 1.0;
+            }
+
+        private:
+            void parameterChanged(juce::String const &parameterID, float newValue) override;
+
+            juce::AudioProcessorValueTreeState &state_;
+            Envelope envelope_;
         };
     }
 }

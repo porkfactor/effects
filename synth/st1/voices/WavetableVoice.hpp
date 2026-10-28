@@ -28,7 +28,7 @@ namespace st1
             double velocity_{0.0};
             double readIndex_{0.0};
             double delta_{0.0};
-            double phase_modulation_{0.0};
+            // double phase_modulation_{0.0};
         };
     }
 }

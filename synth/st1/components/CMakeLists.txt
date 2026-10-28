@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.25.0)
 
 list(APPEND SOURCES
+    ${CMAKE_CURRENT_LIST_DIR}/AnalogDial.cpp
     ${CMAKE_CURRENT_LIST_DIR}/AnalogDial.hpp
     ${CMAKE_CURRENT_LIST_DIR}/EnvelopeEditor.cpp
     ${CMAKE_CURRENT_LIST_DIR}/EnvelopeEditor.hpp

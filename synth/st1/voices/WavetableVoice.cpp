@@ -74,7 +74,7 @@ namespace st1
 
             std::size_t sampleIndex = static_cast<std::size_t>(modulatedSampleIndex);
 
-            double fFrac = modulatedSampleIndex - static_cast<double>(sampleIndex);
+            // double fFrac = modulatedSampleIndex - static_cast<double>(sampleIndex);
 
             /* note: sample data is opaquely over-allocated by one sample */
             // dOut = linear_interpolate(0.0, samples[sampleIndex], 1.0, samples[sampleIndex + 1], fFrac);

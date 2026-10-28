@@ -52,6 +52,7 @@ namespace st1
                 {}
             };
 
+            EnvelopeVisualizer envelope_;
             AttackDial attackDial_;
             DecayDial decayDial_;
             SustainDial sustainDial_;

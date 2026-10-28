@@ -39,6 +39,16 @@ target_compile_definitions(st1
         JUCE_VST3_CAN_REPLACE_VST2=0
 )
 
+target_compile_options(st1
+    PUBLIC
+        -Werror
+)
+
+target_include_directories(st1
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
+)
+
 target_link_libraries(st1
     PRIVATE
         juce::juce_audio_utils

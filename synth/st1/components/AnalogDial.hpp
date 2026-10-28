@@ -12,39 +12,12 @@ namespace st1
             public juce::Component
         {
         public:
-            AnalogDial(juce::String const &name, juce::String const &label = juce::String()) :
-                juce::Component(name),
-                slider_(name + ".slider"),
-                label_(name + ".label", label)
-            {
-                slider_.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-                slider_.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 80, 20);
-                label_.setJustificationType(juce::Justification::centred);
+            AnalogDial(juce::String const &name, juce::String const &label = juce::String());
 
-                Component::addAndMakeVisible(slider_);
-                Component::addAndMakeVisible(label_);
-            }
+            void resized(void) override;
 
-            void resized(void) override
-            {
-                auto bounds = Component::getLocalBounds();
-
-                label_.setBounds(bounds.removeFromTop(20));
-                slider_.setBounds(bounds);
-            }
-
-            void attach(juce::RangedAudioParameter *parameter, juce::UndoManager *undoManager = nullptr)
-            {
-                if (parameter)
-                {
-                    attachment_.reset(new juce::SliderParameterAttachment(*parameter, slider_, undoManager));
-                }
-            }
-
-            void attach(juce::AudioProcessorValueTreeState &s, juce::StringRef parameterId)
-            {
-                attach(s.getParameter(parameterId), s.undoManager);
-            }
+            void attach(juce::RangedAudioParameter *parameter, juce::UndoManager *undoManager = nullptr);
+            void attach(juce::AudioProcessorValueTreeState &s, juce::StringRef parameterId);
 
         private:
             juce::Slider slider_;
