@@ -141,7 +141,8 @@ namespace st1
         static juce::Point<float> attack_point(juce::Point<float> const &start, juce::Point<float> const &end, float x)
         {
             float absoluteX = start.getX() + ((end.getX() - start.getX()) * x);
-            float absoluteY = start.getY() + (1.0f - std::exp(-1.5f * x));
+            float y = (1.0f - std::exp(-1.5f * x));
+            float absoluteY = start.getY() + ((end.getY() - start.getY()) * y);
 
             return juce::Point<float>(absoluteX, absoluteY);
         }
@@ -149,7 +150,8 @@ namespace st1
         static juce::Point<float> decay_point(juce::Point<float> const &start, juce::Point<float> const &end, float x)
         {
             float absoluteX = start.getX() + ((end.getX() - start.getX()) * x);
-            float absoluteY = end.getY() + std::exp(-4.95f * x);
+            float y = std::exp(-4.95f * x);
+            float absoluteY = end.getY() + ((start.getY() - end.getY()) * y);
 
             return juce::Point<float>(absoluteX, absoluteY);
         }
