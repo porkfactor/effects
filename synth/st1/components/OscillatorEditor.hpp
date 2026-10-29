@@ -19,28 +19,15 @@ namespace st1
             void resized() override;
 
         private:
-            class OscillatorTypeCombo :
-                public juce::ComboBox
+            class OscillatorTypeDial final : public AnalogDial
             {
             public:
-                OscillatorTypeCombo(juce::RangedAudioParameter *parameter, juce::String const &name, juce::UndoManager *undoManager = nullptr) :
-                    ComboBox(name)
-                {
-                    if (parameter)
-                    {
-                        ComboBox::addItemList(parameter->getAllValueStrings(), 1);
-                        attachment_.reset(new juce::ComboBoxParameterAttachment(*parameter, *this, undoManager));
-                    }
-                }
-        
-                ~OscillatorTypeCombo()
+                OscillatorTypeDial(juce::String const &name, juce::String const &label) :
+                    AnalogDial(name, label)
                 {}
-
-            private:
-                std::unique_ptr<juce::ComboBoxParameterAttachment> attachment_;
             };
 
-            class PitchShiftDial : public AnalogDial
+            class PitchShiftDial final : public AnalogDial
             {
             public:
                 PitchShiftDial(juce::String const &name, juce::String const &label) :
@@ -48,7 +35,7 @@ namespace st1
                 {}
             };
 
-            class PulseWidthDial : public AnalogDial
+            class PulseWidthDial final : public AnalogDial
             {
             public:
                 PulseWidthDial(juce::String const &name, juce::String const &label) :
@@ -56,7 +43,7 @@ namespace st1
                 {}
             };
 
-            class AmplitudeDial : public AnalogDial
+            class AmplitudeDial final : public AnalogDial
             {
             public:
                 AmplitudeDial(juce::String const &name, juce::String const &label) :
@@ -64,7 +51,7 @@ namespace st1
                 {}
             };
 
-            OscillatorTypeCombo oscillatorTypeCombo_;
+            OscillatorTypeDial oscillatorTypeDial_;
             PitchShiftDial pitchShiftDial_;
             PulseWidthDial pulseWidthDial_;
             AmplitudeDial amplitudeDial_;

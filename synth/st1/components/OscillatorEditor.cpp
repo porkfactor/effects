@@ -1,21 +1,27 @@
 #include "OscillatorEditor.hpp"
 
+#include <parameters/OscillatorAmplitudeParameter.hpp>
+#include <parameters/OscillatorPulseWidthParameter.hpp>
+#include <parameters/OscillatorPitchShiftParameter.hpp>
+#include <parameters/OscillatorTypeParameter.hpp>
+
 namespace st1
 {
     namespace components
     {
         OscillatorEditor::OscillatorEditor(juce::AudioProcessorValueTreeState &s, juce::String const &name) :
             Component(name),
-            oscillatorTypeCombo_(s.getParameter("OCOT"), name + ".oscillator_type", s.undoManager),
+            oscillatorTypeDial_(name + ".wave_type", "Wave Type"),
             pitchShiftDial_(name + ".pitch_shift", "Pitch Shift"),
             pulseWidthDial_(name + ".pulse_width", "Pulse Width"),
             amplitudeDial_(name + ".amplitude", "Amplitude")
         {
-            pitchShiftDial_.attach(s, "OFPS");
-            pulseWidthDial_.attach(s, "OFPW");
-            amplitudeDial_.attach(s, "OFAM");
+            oscillatorTypeDial_.attach(s, OscillatorTypeParameter::identifier());
+            pitchShiftDial_.attach(s, OscillatorPitchShiftParameter::identifier());
+            pulseWidthDial_.attach(s, OscillatorPulseWidthParameter::identifier());
+            amplitudeDial_.attach(s, OscillatorAmplitudeParameter::identifier());
 
-            Component::addAndMakeVisible(oscillatorTypeCombo_);
+            Component::addAndMakeVisible(oscillatorTypeDial_);
             Component::addAndMakeVisible(pitchShiftDial_);
             Component::addAndMakeVisible(pulseWidthDial_);
             Component::addAndMakeVisible(amplitudeDial_);
@@ -26,11 +32,10 @@ namespace st1
             auto bounds = Component::getLocalBounds();
             auto width = bounds.getWidth();
 
-            oscillatorTypeCombo_.setBounds(bounds.removeFromTop(30));
-
-            pitchShiftDial_.setBounds(bounds.removeFromLeft(width / 3));
-            pulseWidthDial_.setBounds(bounds.removeFromLeft(width / 3));
-            amplitudeDial_.setBounds(bounds.removeFromLeft(width / 3));
+            oscillatorTypeDial_.setBounds(bounds.removeFromLeft(width / 4));
+            pitchShiftDial_.setBounds(bounds.removeFromLeft(width / 4));
+            pulseWidthDial_.setBounds(bounds.removeFromLeft(width / 4));
+            amplitudeDial_.setBounds(bounds.removeFromLeft(width / 4));
         }
     }
 }

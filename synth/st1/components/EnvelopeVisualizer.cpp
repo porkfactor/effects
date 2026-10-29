@@ -60,10 +60,10 @@ namespace st1
                 static float const horizontal_ticks[] = { 0.25f, 0.5f, 0.75f };
 
                 /* background */
-                g.fillAll(juce::Colours::darkgrey);
+                g.fillAll(Component::findColour(juce::ResizableWindow::backgroundColourId));
 
                 /* horizontal tick lines */
-                g.setColour(juce::Colours::lightblue);
+                g.setColour(Component::findColour(juce::Slider::ColourIds::rotarySliderOutlineColourId));
                 for (int i = 0; i < juce::numElementsInArray(vertical_ticks); ++i)
                 {
                     float y = scaled_height * vertical_ticks[i];
@@ -72,7 +72,7 @@ namespace st1
                 }
 
                 /* verfical tick lines */
-                g.setColour(juce::Colours::lightblue);
+                g.setColour(Component::findColour(juce::Slider::ColourIds::rotarySliderOutlineColourId));
                 for (int i = 0; i < juce::numElementsInArray(horizontal_ticks); ++i)
                 {
                     float x = scaled_width * horizontal_ticks[i];
@@ -85,11 +85,17 @@ namespace st1
                 /* grid lines */
                 static float const dashes[] = { 4.0f, 4.0f };
                 float scaled_sustain = (1.0f - sustainParameter_->getValue()) * static_cast<float>(bounds.getHeight());
-                float scaled_attack = attackParameter_->getValue() * (scaled_width / 5.0f);
                 
-                g.setColour(juce::Colours::darkblue);
+                g.setColour(Component::findColour(juce::Slider::ColourIds::rotarySliderFillColourId));
+                /* sustain level */
                 g.drawDashedLine(juce::Line<float>{{0.0f, scaled_sustain}, {scaled_width, scaled_sustain}}, dashes, 2, 1.0f);
-                g.drawDashedLine(juce::Line<float>{{scaled_attack, 0.0f}, {scaled_attack, scaled_height}}, dashes, 2, 1.0f);
+
+                /* vertical intercept */
+                for (auto const &segment : segments_)
+                {
+                    float x = segment.end().getX() * (scaled_width / 5);
+                    g.drawDashedLine(juce::Line<float>{{x, 0.0f}, {x, scaled_height}}, dashes, 2, 1.0f);
+                }
             }
 
             {
@@ -119,10 +125,12 @@ namespace st1
                         curvePath.lineTo(segment.end() * scale);
                     #endif
                     }
+
+                    curvePath.lineTo(juce::Point<float>(scaled_width, scaled_height));
                 }
     
-                g.setColour(juce::Colours::cyan);
-                g.strokePath(curvePath, juce::PathStrokeType(3.0f));
+                g.setColour(Component::findColour(juce::Slider::ColourIds::thumbColourId));
+                g.strokePath(curvePath, juce::PathStrokeType(2.0f));
             }
 
             if (selected_ != npos)
@@ -148,6 +156,15 @@ namespace st1
         }
 
         static juce::Point<float> decay_point(juce::Point<float> const &start, juce::Point<float> const &end, float x)
+        {
+            float absoluteX = start.getX() + ((end.getX() - start.getX()) * x);
+            float y = std::exp(-4.95f * x);
+            float absoluteY = end.getY() + ((start.getY() - end.getY()) * y);
+
+            return juce::Point<float>(absoluteX, absoluteY);
+        }
+
+        static juce::Point<float> release_point(juce::Point<float> const &start, juce::Point<float> const &end, float x)
         {
             float absoluteX = start.getX() + ((end.getX() - start.getX()) * x);
             float y = std::exp(-4.95f * x);
@@ -192,7 +209,7 @@ namespace st1
             /* release */
             {
                 end = juce::Point<float>(start.getX() + release, 0.0f);
-                segments_.push_back(EnvelopeSegment<float>(start, end));
+                segments_.push_back(EnvelopeSegment<float>(start, release_point(start, end, 0.25f), release_point(start, end, 0.5f), end));
                 start = end;
             }
         }

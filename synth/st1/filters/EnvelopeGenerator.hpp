@@ -54,8 +54,12 @@ namespace st1
                 }
             }
 
-            void start(void)
+            void start(double sample_rate)
             {
+                sample_rate_ = sample_rate;
+
+                set_mode();
+
                 switch (state_)
                 {
                 case envelope_state::initial:
@@ -159,6 +163,8 @@ namespace st1
             {
                 void configure(double sample_rate, double tco, double distance)
                 {
+                    duration_ = 100.0;
+
                     double sample_count = sample_rate * (duration_ / 1000.0);
                     coefficient_ = std::exp(-std::log((1.0 + tco) / tco) / sample_count);
                     offset_ = (distance + tco) * (1.0 - coefficient_);
@@ -178,6 +184,8 @@ namespace st1
             {
                 void configure(double sample_rate, double tco, double distance)
                 {
+                    duration_ = 100.0;
+
                     double sample_count = sample_rate * (duration_ / 1000.0);
                     coefficient_ = std::exp(-std::log((1.0 + tco) / tco) / sample_count);
                     offset_ = (distance - tco) * (1.0 - coefficient_);
@@ -224,6 +232,7 @@ namespace st1
                 void configure(double sample_rate, double tco, double distance)
                 {
                     (void)distance;
+                    duration_ = 1000.0;
 
                     double sample_count = sample_rate * (duration_ / 1000.0);
                     coefficient_ = std::exp(-std::log((1.0 + tco) / tco) / sample_count);
@@ -260,7 +269,7 @@ namespace st1
 
             double sample_rate_{};
             double output_{};
-            double sustain_level_{};
+            double sustain_level_{0.8};
 
             struct attack attack_;
             struct decay decay_;
@@ -280,9 +289,9 @@ namespace st1
 
             static std::unique_ptr<juce::AudioProcessorParameterGroup> parameters(juce::String const &);
 
-            void startNote(void) noexcept
+            void startNote(double sample_rate) noexcept
             {
-                envelope_.start();
+                envelope_.start(sample_rate);
             }
 
             void stopNote(void) noexcept
@@ -297,14 +306,12 @@ namespace st1
 
             bool active(void) const noexcept
             {
-                // return envelope_.active();
-                return true;
+                return envelope_.active();
             }
 
             inline double process(void) noexcept
             {
-                // return envelope_.generate();
-                return 1.0;
+                return envelope_.generate();
             }
 
         private:

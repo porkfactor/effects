@@ -19,12 +19,18 @@ namespace st1
             return std::make_unique<juce::AudioParameterFloat>(
                 juce::ParameterID(identifier(), 1),
                 name,
-                juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f),
-                1.0f,
+                juce::NormalisableRange<float>(0.0f, 1000.0f, 10.0f),
+                1000.0f,
                 juce::AudioParameterFloatAttributes()
-                    .withLabel("Amplitude")
+                    .withLabel("Release")
                     .withCategory(juce::AudioProcessorParameter::Category::genericParameter)
+                    .withStringFromValueFunction(std::bind(&EnvelopeReleaseParameter::stringFromValue, std::placeholders::_1))
             );
+        }
+
+        static juce::String stringFromValue(float v)
+        {
+            return juce::String(v, 0) + " ms";
         }
 
     private:

@@ -38,7 +38,7 @@ namespace st1
                     square,
                     triangle,
                 },
-                0,
+                static_cast<int>(OscillatorType::SINUSOID),
                 juce::AudioParameterChoiceAttributes()
                     .withLabel("selected")
                     .withStringFromValueFunction(std::bind(&OscillatorTypeParameter::stringFromValue, std::placeholders::_1))

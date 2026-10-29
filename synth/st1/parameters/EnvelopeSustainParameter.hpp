@@ -20,9 +20,9 @@ namespace st1
                 juce::ParameterID(identifier(), 1),
                 name,
                 juce::NormalisableRange<float>(0.0f, 1.0f, 0.1f),
-                1.0,
+                0.8,
                 juce::AudioParameterFloatAttributes()
-                    .withLabel("Amplitude")
+                    .withLabel("Sustain")
                     .withCategory(juce::AudioProcessorParameter::Category::genericParameter)
             );
         }

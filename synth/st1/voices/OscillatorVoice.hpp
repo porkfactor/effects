@@ -23,15 +23,21 @@ namespace st1
                 square,
             };
 
-            void startNote(double sampleRate, double pitchFrequency)
+            Oscillator(double harmonic = 1.0, double amplitude = 1.0) :
+                harmonic_{harmonic},
+                amplitude_{amplitude}
+            {}
+
+            void startNote(double sampleRate, double pitchFrequency, enum wave_type type)
             {
-                pitchFrequency_ = pitchFrequency;
-                delta_ = pitchFrequency / sampleRate;
+                type_ = type;
+                pitchFrequency_ = pitchFrequency * harmonic_;
+                delta_ = pitchFrequency_ / sampleRate;
             }
 
             void reset(void)
             {
-
+                type_ = wave_type::sinusoid;
             }
 
             void pitchShift(double cents)
@@ -64,10 +70,12 @@ namespace st1
                 if (modulo_ > 1.0)
                     modulo_ -= 1.0;
 
-                return sample;
+                return sample * amplitude_;
             }
 
         private:
+            double harmonic_{1.0};
+            double amplitude_{1.0};
             double delta_{};
             double modulo_{};
             double pitchFrequency_{};
@@ -96,12 +104,25 @@ namespace st1
             static std::unique_ptr<juce::AudioProcessorParameterGroup> parameters(juce::String const &);
 
         private:
+            void parameterWaveTypeCallback(float);
+            void parameterAmplitudeCallback(float);
+            void parameterPitchShiftCallback(float);
+            void parameterPulseWidthCallback(float);
+
+            void setPitchShift(double);
+            void setWaveType(enum Oscillator::wave_type);
+
             void reset();
 
             juce::AudioProcessorValueTreeState &state_;
-            Oscillator oscillator_;
+
+            std::vector<Oscillator> oscillators_;
             filters::EnvelopeGenerator envelope_;
-            double velocity_;
+            double velocity_{};
+            double amplitude_{};
+            double pitchShift_{1.0};
+            double pitchAdjust_{1.0};
+            Oscillator::wave_type wave_type_{Oscillator::wave_type::sinusoid};
         };
     }
 }
