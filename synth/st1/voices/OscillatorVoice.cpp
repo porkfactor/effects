@@ -62,7 +62,7 @@ namespace st1
 
             if (auto parameter = state_.getParameter(OscillatorPitchShiftParameter::identifier()))
             {
-                parameterPitchShiftCallback(parameter->getValue());
+                parameterPitchShiftCallback(parameter->convertFrom0to1(parameter->getValue()));
             }
 
             if (auto parameter = state_.getParameter(OscillatorTypeParameter::identifier()))
@@ -237,6 +237,7 @@ namespace st1
         void OscillatorVoice::setPitchShift(double semitones)
         {
             pitchShift_ = std::exp2(static_cast<double>(semitones) / 12.0);
+
             for (auto &oscillator : oscillators_)
             {
                 oscillator.pitchShift(pitchShift_ * pitchAdjust_);
