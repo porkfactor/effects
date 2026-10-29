@@ -26,21 +26,41 @@ namespace st1
                 return state_ != envelope_state::initial;
             }
 
+            void set_attack_duration(double milliseconds)
+            {
+                attack_duration_ = milliseconds;
+            }
+
+            void set_decay_duration(double milliseconds)
+            {
+                decay_duration_ = milliseconds;
+            }
+
+            void set_release_duration(double milliseconds)
+            {
+                release_duration_ = milliseconds;
+            }
+
+            void set_sustain_level(double level)
+            {
+                sustain_level_ = level;
+            }
+
             void set_mode(void)
             {
                 if (true) /* analog */
                 {
-                    attack_.configure(sample_rate_, std::exp(1.5), 1.0);
-                    decay_.configure(sample_rate_, std::exp(-4.95), sustain_level_);
-                    sustain_.configure(sample_rate_, 0.0, sustain_level_);
-                    release_.configure(sample_rate_, std::exp(-4.95), -sustain_level_);
+                    attack_.configure(sample_rate_ * (attack_duration_ / 1000.0), std::exp(1.5), 1.0);
+                    decay_.configure(sample_rate_ * (decay_duration_ / 1000.0), std::exp(-4.95), sustain_level_);
+                    sustain_.configure(0.0, 0.0, sustain_level_);
+                    release_.configure(sample_rate_ * (release_duration_ / 1000.0), std::exp(-4.95), -sustain_level_);
                 }
                 else
                 {
-                    attack_.configure(sample_rate_, 0.99999, 1.0);
-                    decay_.configure(sample_rate_, std::exp(-11.05), sustain_level_);
-                    sustain_.configure(sample_rate_, 0.0, sustain_level_);
-                    release_.configure(sample_rate_, std::exp(-11.05), -sustain_level_);
+                    attack_.configure(sample_rate_ * (attack_duration_ / 1000.0), 0.99999, 1.0);
+                    decay_.configure(sample_rate_ * (decay_duration_ / 1000.0), std::exp(-11.05), sustain_level_);
+                    sustain_.configure(0.0, 0.0, sustain_level_);
+                    release_.configure(sample_rate_ * (release_duration_ / 1000.0), std::exp(-11.05), -sustain_level_);
                 }
             }
 
@@ -161,11 +181,8 @@ namespace st1
         private:
             struct attack
             {
-                void configure(double sample_rate, double tco, double distance)
+                void configure(double sample_count, double tco, double distance)
                 {
-                    duration_ = 100.0;
-
-                    double sample_count = sample_rate * (duration_ / 1000.0);
                     coefficient_ = std::exp(-std::log((1.0 + tco) / tco) / sample_count);
                     offset_ = (distance + tco) * (1.0 - coefficient_);
                 }
@@ -175,18 +192,14 @@ namespace st1
                     return offset_ + (x * coefficient_);
                 }
 
-                double duration_;
-                double offset_;
-                double coefficient_;
+                double offset_{};
+                double coefficient_{};
             };
 
             struct decay
             {
-                void configure(double sample_rate, double tco, double distance)
+                void configure(double sample_count, double tco, double distance)
                 {
-                    duration_ = 100.0;
-
-                    double sample_count = sample_rate * (duration_ / 1000.0);
                     coefficient_ = std::exp(-std::log((1.0 + tco) / tco) / sample_count);
                     offset_ = (distance - tco) * (1.0 - coefficient_);
                 }
@@ -196,17 +209,16 @@ namespace st1
                     return offset_ + (x * coefficient_);
                 }
 
-                double duration_;
-                double offset_;
-                double coefficient_;
+                double offset_{};
+                double coefficient_{};
             };
 
             struct sustain
             {
             public:
-                void configure(double sample_rate, double tco, double distance)
+                void configure(double sample_count, double tco, double distance)
                 {
-                    (void)sample_rate;
+                    (void)sample_count;
                     (void)tco;
                     (void)distance;
 
@@ -224,17 +236,15 @@ namespace st1
                 }
 
             private:
-                double level_;
+                double level_{};
             };
 
             struct release
             {
-                void configure(double sample_rate, double tco, double distance)
+                void configure(double sample_count, double tco, double distance)
                 {
                     (void)distance;
-                    duration_ = 1000.0;
 
-                    double sample_count = sample_rate * (duration_ / 1000.0);
                     coefficient_ = std::exp(-std::log((1.0 + tco) / tco) / sample_count);
                     offset_ = (-tco) * (1.0 - coefficient_);
                 }
@@ -244,16 +254,15 @@ namespace st1
                     return offset_ + (x * coefficient_);
                 }
 
-                double duration_;
-                double offset_;
-                double coefficient_;
+                double offset_{};
+                double coefficient_{};
             };
 
             struct shutdown
             {
-                void configure(double sample_rate, double distance)
+                void configure(double sample_count, double distance)
                 {
-                    increment_ = -(1000.0 * distance) / duration_ / sample_rate;
+                    increment_ = -distance / sample_count;
                 }
 
                 inline double perform(double x)
@@ -261,14 +270,16 @@ namespace st1
                     return x + increment_;
                 }
 
-                double duration_;
-                double increment_;
+                double increment_{};
             };
 
             envelope_state state_{envelope_state::initial};
 
             double sample_rate_{};
             double output_{};
+            double attack_duration_{100.0};
+            double decay_duration_{100.0};
+            double release_duration_{1000.0};
             double sustain_level_{0.8};
 
             struct attack attack_;
@@ -313,6 +324,11 @@ namespace st1
             {
                 return envelope_.generate();
             }
+
+            void setAttackDuration(double);
+            void setDecayDuration(double);
+            void setSustainLevel(double);
+            void setReleaseDuration(double);
 
         private:
             void parameterChanged(juce::String const &parameterID, float newValue) override;

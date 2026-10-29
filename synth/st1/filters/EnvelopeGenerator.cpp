@@ -29,6 +29,26 @@ namespace st1
             state_.addParameterListener(EnvelopeDecayParameter::identifier(), this);
             state_.addParameterListener(EnvelopeSustainParameter::identifier(), this);
             state_.addParameterListener(EnvelopeReleaseParameter::identifier(), this);
+
+            if (auto parameter = state_.getParameter(EnvelopeAttackParameter::identifier()))
+            {
+                setAttackDuration(static_cast<double>(parameter->convertFrom0to1(parameter->getValue())));
+            }
+
+            if (auto parameter = state_.getParameter(EnvelopeDecayParameter::identifier()))
+            {
+                setDecayDuration(static_cast<double>(parameter->convertFrom0to1(parameter->getValue())));
+            }
+
+            if (auto parameter = state_.getParameter(EnvelopeSustainParameter::identifier()))
+            {
+                setSustainLevel(static_cast<double>(parameter->convertFrom0to1(parameter->getValue())));
+            }
+
+            if (auto parameter = state_.getParameter(EnvelopeReleaseParameter::identifier()))
+            {
+                setReleaseDuration(static_cast<double>(parameter->convertFrom0to1(parameter->getValue())));
+            }
         }
 
         EnvelopeGenerator::~EnvelopeGenerator()
@@ -41,8 +61,42 @@ namespace st1
 
         void EnvelopeGenerator::parameterChanged(juce::String const &parameterID, float newValue)
         {
-            juce::ignoreUnused(parameterID);
-            juce::ignoreUnused(newValue);
+            if (parameterID == EnvelopeAttackParameter::identifier())
+            {
+                setAttackDuration(static_cast<double>(newValue));
+            }
+            else if (parameterID == EnvelopeDecayParameter::identifier())
+            {
+                setDecayDuration(static_cast<double>(newValue));
+            }
+            else if (parameterID == EnvelopeSustainParameter::identifier())
+            {
+                setSustainLevel(static_cast<double>(newValue));
+            }
+            else if (parameterID == EnvelopeReleaseParameter::identifier())
+            {
+                setReleaseDuration(static_cast<double>(newValue));
+            }
+        }
+
+        void EnvelopeGenerator::setAttackDuration(double milliseconds)
+        {
+            envelope_.set_attack_duration(milliseconds);
+        }
+
+        void EnvelopeGenerator::setDecayDuration(double milliseconds)
+        {
+            envelope_.set_decay_duration(milliseconds);
+        }
+
+        void EnvelopeGenerator::setReleaseDuration(double milliseconds)
+        {
+            envelope_.set_release_duration(milliseconds);
+        }
+
+        void EnvelopeGenerator::setSustainLevel(double level)
+        {
+            envelope_.set_sustain_level(level);
         }
     }
 }

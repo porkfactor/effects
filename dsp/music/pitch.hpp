@@ -38,7 +38,7 @@ namespace dsp
             }
 
         private:
-            std::ratio<1> hertz_;
+            double hertz_;
         };
 
         template<typename _Rep, typename _Period>
