@@ -113,6 +113,7 @@ namespace st1
             {
                 oscillator.startNote(SynthesiserVoice::getSampleRate(), juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber), wave_type_);
             }
+
             envelope_.startNote(SynthesiserVoice::getSampleRate());
             velocity_ = static_cast<double>(velocity);
 
@@ -122,7 +123,6 @@ namespace st1
         void OscillatorVoice::stopNote(float velocity, bool allowTailOff)
         {
             juce::ignoreUnused(velocity);
-            juce::ignoreUnused(allowTailOff);
 
             if (allowTailOff)
             {
@@ -163,7 +163,7 @@ namespace st1
 
         void OscillatorVoice::renderNextBlock(juce::AudioBuffer<float> &outputBuffer, int startSample, int numSamples)
         {
-            if (velocity_ != 0.0)
+            if (envelope_.active())
             {
                 int const numChannels = outputBuffer.getNumChannels();
                 int sampleIdx{};
@@ -192,7 +192,9 @@ namespace st1
             }
 
             if (!envelope_.active())
-                clearCurrentNote();
+            {
+                SynthesiserVoice::clearCurrentNote();
+            }
         }
 
         void OscillatorVoice::parameterWaveTypeCallback(float newValue)

@@ -20,7 +20,7 @@ namespace st1
                 juce::ParameterID(identifier(), 1),
                 name,
                 juce::NormalisableRange<float>(0.0f, 1000.0f, 10.0f),
-                300.0f,
+                110.0f,
                 juce::AudioParameterFloatAttributes()
                     .withLabel("Attack")
                     .withCategory(juce::AudioProcessorParameter::Category::genericParameter)

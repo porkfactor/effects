@@ -20,7 +20,7 @@ namespace st1
                 juce::ParameterID(identifier(), 1),
                 name,
                 juce::NormalisableRange<float>(0.0f, 1000.0f, 10.0f),
-                200.0f,
+                70.0f,
                 juce::AudioParameterFloatAttributes()
                     .withLabel("Decay")
                     .withCategory(juce::AudioProcessorParameter::Category::genericParameter)

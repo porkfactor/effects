@@ -74,6 +74,12 @@ namespace st1
                 }
             }
 
+            void clear()
+            {
+                reset();
+                output_ = 0.0;
+            }
+
             void start(double sample_rate)
             {
                 sample_rate_ = sample_rate;
@@ -312,7 +318,7 @@ namespace st1
 
             void reset(void) noexcept
             {
-                envelope_.reset();
+                envelope_.clear();
             }
 
             bool active(void) const noexcept
