@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.22)
 
 juce_add_plugin(st1
-    # VERSION ...                               # Set this if the plugin version is different to the project version
+    VERSION ${PROJECT_VERSION}
     # ICON_BIG ...                              # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
     # ICON_SMALL ...
-    # COMPANY_NAME ...                          # Specify the name of the plugin's author
+    COMPANY_NAME "org.porkfactor"
     IS_SYNTH TRUE
     NEEDS_MIDI_INPUT TRUE
     NEEDS_MIDI_OUTPUT FALSE

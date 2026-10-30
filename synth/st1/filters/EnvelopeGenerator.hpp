@@ -143,14 +143,14 @@ namespace st1
                 case envelope_state::decay:
                     output_ = decay_.perform(output_);
 
-                    if  (output_ <= sustain_level_)
+                    if  (output_ <= sustain_.level())
                     {
                         state_ = envelope_state::sustain;
                     }
                     break;
 
                 case envelope_state::sustain:
-                    output_ = sustain_level_;
+                    output_ = sustain_.perform(output_);
                     break;
 
                 case envelope_state::release:
@@ -233,7 +233,8 @@ namespace st1
 
                 inline double perform(double x)
                 {
-                    return level_ * x;
+                    (void)x;
+                    return level_;
                 }
 
                 inline double level() const noexcept

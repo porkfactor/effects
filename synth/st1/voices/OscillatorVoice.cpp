@@ -163,10 +163,11 @@ namespace st1
 
         void OscillatorVoice::renderNextBlock(juce::AudioBuffer<float> &outputBuffer, int startSample, int numSamples)
         {
+            int sampleIdx{};
+
             if (envelope_.active())
             {
                 int const numChannels = outputBuffer.getNumChannels();
-                int sampleIdx{};
                 float currentSample = 0.0f;
 
                 do
@@ -181,6 +182,12 @@ namespace st1
 
                     currentSample = static_cast<float>(envelope_.process() * sample * velocity_);
 
+                    if (!envelope_.active())
+                    {
+                        SynthesiserVoice::clearCurrentNote();
+                        break;
+                    }
+
                     do
                     {
                         outputBuffer.addSample(channelIdx, startSample + sampleIdx, currentSample);
@@ -193,7 +200,7 @@ namespace st1
 
             if (!envelope_.active())
             {
-                SynthesiserVoice::clearCurrentNote();
+                outputBuffer.clear(sampleIdx, numSamples - sampleIdx);
             }
         }
 
